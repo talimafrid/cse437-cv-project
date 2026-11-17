@@ -1,0 +1,13 @@
+# YOLOv8 Training Configuration for SKU-110K
+# =============================================
+# Used by: scripts/convert_sku110k.py → then `yolo train`
+# Single class: "product" (class-agnostic detection)
+
+path: ../data/sku110k_yolo
+train: images/train
+val: images/val
+test: images/test
+
+nc: 1
+names:
+  0: product

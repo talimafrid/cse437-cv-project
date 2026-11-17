@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Heavy raw image directories
+data/sku110k/images/
+data/grozi/Training/
+data/grozi/Testing/
+data/*.tar.gz
+data/*.zip
+
+# Tracked dataset (labels/annotations only - images are Colab-downloaded)
+# SKU-110K images intentionally NOT tracked (too large for GitHub)
+data/sku110k_yolo/images/
+!data/sku110k/annotations/
+!data/sku110k_yolo/labels/
+!data/gp180/
+!data/grozi/bb/
+!data/grozi/planos/
+
+# Model weights (allow the final best.pt model to be pushed)
+models/*.pt
+!models/sku110k_best.pt
+models/*.pth
+models/*.onnx
+
+# Outputs
+outputs/
+runs/
+
+# Jupyter
+.ipynb_checkpoints/
