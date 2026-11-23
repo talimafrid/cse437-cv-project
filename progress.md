@@ -40,3 +40,5 @@
 
 ## Session 2026-11-24
 - Demo launched and driven through its Gradio API (audit, inject, re-audit). Fix: app inject tab now uses localisable=True (same rule as A5). 50 test shelves: median compliance 100%; s1_28 (67.7%) is an outlier. Good live cases: s5_72 seed 0/2, s5_37 seed 2. Not committed.
+- One-click launchers (run_demo.bat, run_docker.bat), Dockerfile + compose (CPU default, GPU override), CPU fallback in get_device, README rewritten as setup guide. models/ + outputs/ pushed via Git LFS (SKU-110K not pushed: 2 GB LFS file cap, brief C14). Pushed e78766c8 to main.
+- Verified: Docker image builds (19.1 GB); container audit identical on GPU (cuda) and CPU-only compose; run_demo.bat launches and serves audits. Fixed .bat line endings (CRLF via .gitattributes).

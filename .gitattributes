@@ -5,3 +5,4 @@ outputs/index/** filter=lfs diff=lfs merge=lfs -text
 outputs/cache/** filter=lfs diff=lfs merge=lfs -text
 outputs/**/*.jpg filter=lfs diff=lfs merge=lfs -text
 outputs/**/*.png filter=lfs diff=lfs merge=lfs -text
+*.bat text eol=crlf
