@@ -35,18 +35,18 @@ data/sku110k_yolo/images/
 !data/grozi/bb/
 !data/grozi/planos/
 
-# Model weights (allow the final best.pt model to be pushed)
-models/*.pt
-!models/sku110k_best.pt
-models/*.pth
-models/*.onnx
+# Model weights are tracked with Git LFS (see .gitattributes)
+/yolo11s.pt
 
-# Outputs
-outputs/
+# Outputs are tracked (large files via Git LFS) except the demo's scratch folder
+outputs/demo/
 runs/
+.pytest_cache/
 
 # Jupyter
 .ipynb_checkpoints/
 # SKU-110K raw + YOLO copy (regenerate with scripts/prepare_data.py; never redistribute, C14)
 data/SKU110K_fixed/
 data/sku110k_yolo/
+/outputs/sku110k_test_subset.yaml
+/outputs/sku110k_test_subset_paths.txt

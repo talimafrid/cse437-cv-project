@@ -1,0 +1,40 @@
+{
+  "image": "s1_15",
+  "n_annotated_boxes": 26,
+  "rows": [
+    [
+      "Food/Rice/17",
+      "Food/Rice/17",
+      "Food/Rice/11",
+      "Food/Rice/11",
+      "Food/Rice/11"
+    ],
+    [
+      "Food/Rice/12",
+      "Food/Rice/12",
+      "Food/Rice/12",
+      "Food/Rice/21",
+      "Food/Rice/21",
+      "Food/Rice/21",
+      "Food/Rice/21"
+    ],
+    [
+      "Food/Rice/18",
+      "Food/Rice/18",
+      "Food/Rice/20",
+      "Food/Rice/20",
+      "Food/Rice/20",
+      "Food/Rice/22"
+    ],
+    [
+      "Food/Rice/7",
+      "Food/Rice/7",
+      "Food/Rice/7",
+      "Food/Rice/7",
+      "Food/Rice/7",
+      "Food/Rice/5",
+      "Food/Rice/5",
+      "Food/Rice/5"
+    ]
+  ]
+}

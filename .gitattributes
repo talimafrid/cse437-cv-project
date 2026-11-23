@@ -1,1 +1,7 @@
 splits/* -text
+# Git LFS: model weights, gallery indexes, evaluation caches and output images
+*.pt filter=lfs diff=lfs merge=lfs -text
+outputs/index/** filter=lfs diff=lfs merge=lfs -text
+outputs/cache/** filter=lfs diff=lfs merge=lfs -text
+outputs/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+outputs/**/*.png filter=lfs diff=lfs merge=lfs -text

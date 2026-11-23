@@ -1,0 +1,20 @@
+{
+  "image": "s2_51",
+  "n_annotated_boxes": 10,
+  "rows": [
+    [
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/1",
+      "Food/Jars-Cans/Spreads/1"
+    ],
+    [
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/1",
+      "Food/Jars-Cans/Spreads/1"
+    ]
+  ]
+}

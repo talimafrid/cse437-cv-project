@@ -1,0 +1,22 @@
+{
+  "image": "s3_167",
+  "n_annotated_boxes": 12,
+  "rows": [
+    [
+      "Food/Drinks/Choco/12",
+      "Food/Drinks/Choco/12",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34"
+    ],
+    [
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29"
+    ]
+  ]
+}

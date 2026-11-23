@@ -1,0 +1,30 @@
+{
+  "image": "s3_161",
+  "n_annotated_boxes": 20,
+  "rows": [
+    [
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/30",
+      "Food/Drinks/Milk/30",
+      "Food/Drinks/Milk/30",
+      "Food/Drinks/Milk/30",
+      "Food/Drinks/Milk/26",
+      "Food/Drinks/Milk/26"
+    ],
+    [
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19",
+      "Food/Drinks/Milk/19"
+    ]
+  ]
+}

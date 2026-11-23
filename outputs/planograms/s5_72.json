@@ -1,0 +1,37 @@
+{
+  "image": "s5_72",
+  "n_annotated_boxes": 21,
+  "rows": [
+    [
+      "Food/Biscuits/76",
+      "Food/Biscuits/76",
+      "Food/Biscuits/76",
+      "Food/Biscuits/45",
+      "Food/Biscuits/45"
+    ],
+    [
+      "Food/Biscuits/76",
+      "Food/Biscuits/76",
+      "Food/Biscuits/76",
+      "Food/Biscuits/45",
+      "Food/Biscuits/45"
+    ],
+    [
+      "Food/Biscuits/80",
+      "Food/Biscuits/80"
+    ],
+    [
+      "Food/Biscuits/74",
+      "Food/Biscuits/74",
+      "Food/Biscuits/74",
+      "Food/Biscuits/80",
+      "Food/Biscuits/80"
+    ],
+    [
+      "Food/Biscuits/74",
+      "Food/Biscuits/74",
+      "Food/Biscuits/74",
+      "Food/Biscuits/80"
+    ]
+  ]
+}

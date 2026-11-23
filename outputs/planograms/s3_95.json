@@ -1,0 +1,35 @@
+{
+  "image": "s3_95",
+  "n_annotated_boxes": 23,
+  "rows": [
+    [
+      "Food/Drinks/Juices/85",
+      "Food/Drinks/Juices/85",
+      "Food/Drinks/Juices/85",
+      "Food/Drinks/Juices/85",
+      "Food/Drinks/Juices/85"
+    ],
+    [
+      "Food/Drinks/Juices/66",
+      "Food/Drinks/Juices/83",
+      "Food/Drinks/Juices/83",
+      "Food/Drinks/Juices/79",
+      "Food/Drinks/Juices/79",
+      "Food/Drinks/Juices/79",
+      "Food/Drinks/Juices/79",
+      "Food/Drinks/Juices/25",
+      "Food/Drinks/Juices/25"
+    ],
+    [
+      "Food/Drinks/Juices/62",
+      "Food/Drinks/Juices/62",
+      "Food/Drinks/Juices/62",
+      "Food/Drinks/Juices/62",
+      "Food/Drinks/Juices/78",
+      "Food/Drinks/Juices/73",
+      "Food/Drinks/Juices/73",
+      "Food/Drinks/Juices/73",
+      "Food/Drinks/Juices/73"
+    ]
+  ]
+}

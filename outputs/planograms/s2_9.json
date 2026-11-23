@@ -1,0 +1,37 @@
+{
+  "image": "s2_9",
+  "n_annotated_boxes": 21,
+  "rows": [
+    [
+      "Food/Tea/57",
+      "Food/Tea/57",
+      "Food/Tea/59",
+      "Food/Tea/59",
+      "Food/Tea/33",
+      "Food/Tea/33",
+      "Food/Tea/48"
+    ],
+    [
+      "Food/Tea/33",
+      "Food/Tea/33"
+    ],
+    [
+      "Food/Tea/33",
+      "Food/Tea/33",
+      "Food/Tea/57",
+      "Food/Tea/57",
+      "Food/Tea/59",
+      "Food/Tea/59"
+    ],
+    [
+      "Food/Tea/48",
+      "Food/Tea/67"
+    ],
+    [
+      "Food/Tea/23",
+      "Food/Tea/48",
+      "Food/Tea/48",
+      "Food/Tea/48"
+    ]
+  ]
+}

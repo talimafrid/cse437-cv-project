@@ -53,10 +53,19 @@ def seed_everything(seed: int):
 
 
 def get_device(cfg: dict) -> str:
-    if cfg.get("device", "auto") != "auto":
-        return cfg["device"]
+    """config `device` (auto/cpu/cuda), overridable with env PLANOGRAM_DEVICE. auto falls back to CPU
+    when there is no GPU or the CUDA driver cannot actually run a kernel (old driver, broken install)."""
+    want = os.getenv("PLANOGRAM_DEVICE") or cfg.get("device", "auto")
+    if want != "auto":
+        return want
     import torch
-    return "cuda" if torch.cuda.is_available() else "cpu"
+    if torch.cuda.is_available():
+        try:
+            (torch.ones(1, device="cuda") + 1).item()
+            return "cuda"
+        except Exception as e:                                  # noqa: BLE001
+            print(f"[device] CUDA present but unusable ({e}); running on CPU")
+    return "cpu"
 
 
 def load_rgb(path_or_img) -> Image.Image:

@@ -1,0 +1,47 @@
+{
+  "image": "s1_28",
+  "n_annotated_boxes": 31,
+  "rows": [
+    [
+      "Food/Jars-Cans/Canned/193",
+      "Food/Jars-Cans/Canned/193",
+      "Food/Jars-Cans/Canned/193",
+      "Food/Jars-Cans/Canned/203",
+      "Food/Jars-Cans/Canned/203",
+      "Food/Jars-Cans/Canned/203",
+      "Food/Jars-Cans/Canned/205",
+      "Food/Jars-Cans/Canned/205",
+      "Food/Jars-Cans/Canned/205"
+    ],
+    [
+      "Food/Jars-Cans/Canned/191",
+      "Food/Jars-Cans/Canned/191",
+      "Food/Jars-Cans/Canned/193",
+      "Food/Jars-Cans/Canned/193",
+      "Food/Jars-Cans/Canned/193",
+      "Food/Jars-Cans/Canned/193"
+    ],
+    [
+      "Food/Jars-Cans/Canned/209",
+      "Food/Jars-Cans/Canned/209"
+    ],
+    [
+      "Food/Jars-Cans/Canned/209",
+      "Food/Jars-Cans/Canned/209",
+      "Food/Jars-Cans/Canned/208",
+      "Food/Jars-Cans/Canned/208",
+      "Food/Jars-Cans/Canned/196",
+      "Food/Jars-Cans/Canned/196",
+      "Food/Jars-Cans/Canned/199"
+    ],
+    [
+      "Food/Jars-Cans/Canned/209",
+      "Food/Jars-Cans/Canned/209",
+      "Food/Jars-Cans/Canned/208",
+      "Food/Jars-Cans/Canned/208",
+      "Food/Jars-Cans/Canned/196",
+      "Food/Jars-Cans/Canned/196",
+      "Food/Jars-Cans/Canned/199"
+    ]
+  ]
+}

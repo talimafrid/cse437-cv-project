@@ -1,0 +1,10 @@
+# Adds the NVIDIA GPU. Needs an NVIDIA driver plus Docker Desktop (WSL2) or nvidia-container-toolkit on Linux.
+services:
+  demo:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

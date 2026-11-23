@@ -1,0 +1,22 @@
+{
+  "image": "s3_270",
+  "n_annotated_boxes": 10,
+  "rows": [
+    [
+      "Food/Rice/13",
+      "Food/Rice/13",
+      "Food/Rice/13"
+    ],
+    [
+      "Food/Rice/20",
+      "Food/Rice/17",
+      "Food/Rice/17"
+    ],
+    [
+      "Food/Rice/38",
+      "Food/Rice/38",
+      "Food/Rice/38",
+      "Food/Rice/38"
+    ]
+  ]
+}

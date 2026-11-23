@@ -1,0 +1,42 @@
+{
+  "image": "s1_16",
+  "n_annotated_boxes": 32,
+  "rows": [
+    [
+      "Food/Pasta/21",
+      "Food/Pasta/21",
+      "Food/Pasta/22",
+      "Food/Pasta/22",
+      "Food/Pasta/22",
+      "Food/Pasta/22",
+      "Food/Pasta/22",
+      "Food/Pasta/15",
+      "Food/Pasta/60",
+      "Food/Pasta/60",
+      "Food/Pasta/60",
+      "Food/Pasta/24",
+      "Food/Pasta/24",
+      "Food/Pasta/24",
+      "Food/Pasta/24",
+      "Food/Pasta/36",
+      "Food/Pasta/36",
+      "Food/Pasta/36",
+      "Food/Pasta/36",
+      "Food/Pasta/62",
+      "Food/Pasta/62",
+      "Food/Pasta/62",
+      "Food/Pasta/21"
+    ],
+    [
+      "Food/Pasta/61",
+      "Food/Pasta/61",
+      "Food/Pasta/61",
+      "Food/Pasta/25",
+      "Food/Pasta/25",
+      "Food/Pasta/25",
+      "Food/Pasta/74",
+      "Food/Pasta/74",
+      "Food/Pasta/74"
+    ]
+  ]
+}

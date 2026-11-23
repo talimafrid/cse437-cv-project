@@ -1,0 +1,23 @@
+{
+  "image": "s1_23",
+  "n_annotated_boxes": 13,
+  "rows": [
+    [
+      "Food/Jars-Cans/Sauces/182",
+      "Food/Jars-Cans/Sauces/182",
+      "Food/Jars-Cans/Sauces/168",
+      "Food/Jars-Cans/Sauces/168",
+      "Food/Jars-Cans/Sauces/175",
+      "Food/Jars-Cans/Sauces/175",
+      "Food/Jars-Cans/Sauces/175"
+    ],
+    [
+      "Food/Jars-Cans/Sauces/172",
+      "Food/Jars-Cans/Sauces/172",
+      "Food/Jars-Cans/Sauces/172",
+      "Food/Jars-Cans/Sauces/170",
+      "Food/Jars-Cans/Sauces/170",
+      "Food/Jars-Cans/Sauces/170"
+    ]
+  ]
+}

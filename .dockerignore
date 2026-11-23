@@ -1,0 +1,12 @@
+# Send only what the Dockerfile copies (the repo also holds ~28 GB of SKU-110K data)
+*
+!requirements.txt
+!configs
+!splits
+!src
+!models/sku110k_yolo11s.pt
+!outputs/index/siglip2_b_v8
+!outputs/planograms
+!data/grozi/bb
+!data/grozi/Testing
+**/__pycache__

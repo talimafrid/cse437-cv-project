@@ -1,0 +1,11 @@
+# CPU:  docker compose up --build
+# GPU:  docker compose -f docker-compose.yml -f docker-compose.gpu.yml up --build
+services:
+  demo:
+    build: .
+    image: planogram-demo:latest
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./outputs/demo:/app/outputs/demo     # audit images and reports land on the host
+    restart: unless-stopped

@@ -1,0 +1,658 @@
+[
+  {
+    "i": 0,
+    "image": "s1_28",
+    "truth": "Food/Jars-Cans/Canned/193",
+    "pred": "Food/Jars-Cans/Canned/194",
+    "cause": "near_identical_variant",
+    "score": 0.9110280275344849
+  },
+  {
+    "i": 10,
+    "image": "s1_28",
+    "truth": "Food/Jars-Cans/Canned/193",
+    "pred": "Food/Jars-Cans/Canned/194",
+    "cause": "near_identical_variant",
+    "score": 0.9041926860809326
+  },
+  {
+    "i": 11,
+    "image": "s1_28",
+    "truth": "Food/Jars-Cans/Canned/193",
+    "pred": "Food/Jars-Cans/Canned/194",
+    "cause": "near_identical_variant",
+    "score": 0.897613525390625
+  },
+  {
+    "i": 15,
+    "image": "s1_28",
+    "truth": "Food/Jars-Cans/Canned/193",
+    "pred": "Food/Jars-Cans/Canned/194",
+    "cause": "near_identical_variant",
+    "score": 0.9108147025108337
+  },
+  {
+    "i": 16,
+    "image": "s1_28",
+    "truth": "Food/Jars-Cans/Canned/193",
+    "pred": "Food/Jars-Cans/Canned/194",
+    "cause": "near_identical_variant",
+    "score": 0.9109032154083252
+  },
+  {
+    "i": 21,
+    "image": "s1_28",
+    "truth": "Food/Jars-Cans/Canned/193",
+    "pred": "Food/Jars-Cans/Canned/194",
+    "cause": "near_identical_variant",
+    "score": 0.8479761481285095
+  },
+  {
+    "i": 24,
+    "image": "s1_28",
+    "truth": "Food/Jars-Cans/Canned/203",
+    "pred": "Food/Jars-Cans/Canned/205",
+    "cause": "near_identical_variant",
+    "score": 0.8897048830986023
+  },
+  {
+    "i": 27,
+    "image": "s1_28",
+    "truth": "Food/Jars-Cans/Canned/203",
+    "pred": "Food/Jars-Cans/Canned/205",
+    "cause": "near_identical_variant",
+    "score": 0.8943600058555603
+  },
+  {
+    "i": 30,
+    "image": "s1_28",
+    "truth": "Food/Jars-Cans/Canned/203",
+    "pred": "Food/Jars-Cans/Canned/205",
+    "cause": "near_identical_variant",
+    "score": 0.8902701139450073
+  },
+  {
+    "i": 38,
+    "image": "s1_43",
+    "truth": "Food/Cereals/140",
+    "pred": "Food/Cereals/98",
+    "cause": "near_identical_variant",
+    "score": 0.9215753078460693
+  },
+  {
+    "i": 42,
+    "image": "s1_43",
+    "truth": "Food/Cereals/140",
+    "pred": "Food/Cereals/139",
+    "cause": "same_subcategory_confusion",
+    "score": 0.9671793580055237
+  },
+  {
+    "i": 97,
+    "image": "s2_14",
+    "truth": "Food/Tea/55",
+    "pred": "Food/Tea/53",
+    "cause": "near_identical_variant",
+    "score": 0.7778128981590271
+  },
+  {
+    "i": 103,
+    "image": "s2_14",
+    "truth": "Food/Tea/55",
+    "pred": "Food/Tea/53",
+    "cause": "near_identical_variant",
+    "score": 0.7661515474319458
+  },
+  {
+    "i": 106,
+    "image": "s2_16",
+    "truth": "Food/Tea/54",
+    "pred": "Food/Tea/53",
+    "cause": "extreme_aspect_or_partial",
+    "score": 0.753070592880249
+  },
+  {
+    "i": 110,
+    "image": "s2_16",
+    "truth": "Food/Tea/54",
+    "pred": "Food/Tea/53",
+    "cause": "near_identical_variant",
+    "score": 0.743076503276825
+  },
+  {
+    "i": 111,
+    "image": "s2_16",
+    "truth": "Food/Tea/54",
+    "pred": "Food/Tea/53",
+    "cause": "extreme_aspect_or_partial",
+    "score": 0.7419111132621765
+  },
+  {
+    "i": 113,
+    "image": "s2_16",
+    "truth": "Food/Tea/54",
+    "pred": "Food/Tea/53",
+    "cause": "extreme_aspect_or_partial",
+    "score": 0.7755705714225769
+  },
+  {
+    "i": 117,
+    "image": "s2_17",
+    "truth": "Food/Tea/71",
+    "pred": "Food/Tea/74",
+    "cause": "extreme_aspect_or_partial",
+    "score": 0.9790734648704529
+  },
+  {
+    "i": 120,
+    "image": "s2_17",
+    "truth": "Food/Tea/71",
+    "pred": "Food/Tea/74",
+    "cause": "extreme_aspect_or_partial",
+    "score": 0.9769682288169861
+  },
+  {
+    "i": 121,
+    "image": "s2_17",
+    "truth": "Food/Tea/71",
+    "pred": "Food/Tea/74",
+    "cause": "extreme_aspect_or_partial",
+    "score": 0.9786865711212158
+  },
+  {
+    "i": 122,
+    "image": "s2_17",
+    "truth": "Food/Tea/71",
+    "pred": "Food/Tea/74",
+    "cause": "extreme_aspect_or_partial",
+    "score": 0.9815405607223511
+  },
+  {
+    "i": 146,
+    "image": "s2_18",
+    "truth": "Food/Tea/50",
+    "pred": "Food/Tea/74",
+    "cause": "near_identical_variant",
+    "score": 0.6867609620094299
+  },
+  {
+    "i": 153,
+    "image": "s2_19",
+    "truth": "Food/Tea/15",
+    "pred": "Food/Tea/11",
+    "cause": "near_identical_variant",
+    "score": 0.8057330846786499
+  },
+  {
+    "i": 162,
+    "image": "s2_20",
+    "truth": "Food/Tea/14",
+    "pred": "Food/Tea/22",
+    "cause": "near_identical_variant",
+    "score": 0.9242345690727234
+  },
+  {
+    "i": 166,
+    "image": "s2_20",
+    "truth": "Food/Tea/23",
+    "pred": "Food/Tea/15",
+    "cause": "near_identical_variant",
+    "score": 0.8326433897018433
+  },
+  {
+    "i": 175,
+    "image": "s2_22",
+    "truth": "Food/Tea/22",
+    "pred": "Food/Tea/14",
+    "cause": "near_identical_variant",
+    "score": 0.9286919236183167
+  },
+  {
+    "i": 183,
+    "image": "s2_49",
+    "truth": "Food/Jars-Cans/Spreads/29",
+    "pred": "Food/Jars-Cans/Spreads/3",
+    "cause": "near_identical_variant",
+    "score": 0.8729271292686462
+  },
+  {
+    "i": 184,
+    "image": "s2_49",
+    "truth": "Food/Jars-Cans/Spreads/32",
+    "pred": "Food/Jars-Cans/Spreads/96",
+    "cause": "same_subcategory_confusion",
+    "score": 0.7420094013214111
+  },
+  {
+    "i": 185,
+    "image": "s2_49",
+    "truth": "Food/Jars-Cans/Spreads/29",
+    "pred": "Food/Jars-Cans/Spreads/95",
+    "cause": "near_identical_variant",
+    "score": 0.8191624879837036
+  },
+  {
+    "i": 187,
+    "image": "s2_49",
+    "truth": "Food/Jars-Cans/Spreads/32",
+    "pred": "Food/Jars-Cans/Spreads/96",
+    "cause": "same_subcategory_confusion",
+    "score": 0.721502423286438
+  },
+  {
+    "i": 188,
+    "image": "s2_49",
+    "truth": "Food/Jars-Cans/Spreads/32",
+    "pred": "Food/Jars-Cans/Spreads/96",
+    "cause": "same_subcategory_confusion",
+    "score": 0.7103490829467773
+  },
+  {
+    "i": 189,
+    "image": "s2_49",
+    "truth": "Food/Jars-Cans/Spreads/29",
+    "pred": "Food/Jars-Cans/Spreads/95",
+    "cause": "near_identical_variant",
+    "score": 0.8373767137527466
+  },
+  {
+    "i": 190,
+    "image": "s2_49",
+    "truth": "Food/Jars-Cans/Spreads/29",
+    "pred": "Food/Jars-Cans/Spreads/95",
+    "cause": "near_identical_variant",
+    "score": 0.8038582801818848
+  },
+  {
+    "i": 194,
+    "image": "s2_74",
+    "truth": "Food/DriedFruitsAndNuts/39",
+    "pred": "Food/DriedFruitsAndNuts/42",
+    "cause": "near_identical_variant",
+    "score": 0.8231231570243835
+  },
+  {
+    "i": 197,
+    "image": "s2_74",
+    "truth": "Food/DriedFruitsAndNuts/39",
+    "pred": "Food/DriedFruitsAndNuts/42",
+    "cause": "near_identical_variant",
+    "score": 0.7970144152641296
+  },
+  {
+    "i": 200,
+    "image": "s2_75",
+    "truth": "Food/DriedFruitsAndNuts/39",
+    "pred": "Food/DriedFruitsAndNuts/42",
+    "cause": "same_subcategory_confusion",
+    "score": 0.9077382683753967
+  },
+  {
+    "i": 202,
+    "image": "s2_75",
+    "truth": "Food/DriedFruitsAndNuts/41",
+    "pred": "Food/Bakery/60",
+    "cause": "cross_category_confusion",
+    "score": 0.7296386957168579
+  },
+  {
+    "i": 206,
+    "image": "s2_75",
+    "truth": "Food/DriedFruitsAndNuts/39",
+    "pred": "Food/DriedFruitsAndNuts/42",
+    "cause": "near_identical_variant",
+    "score": 0.8712252974510193
+  },
+  {
+    "i": 221,
+    "image": "s2_125",
+    "truth": "Food/Coffee/18",
+    "pred": "Food/Coffee/20",
+    "cause": "near_identical_variant",
+    "score": 0.8849748373031616
+  },
+  {
+    "i": 222,
+    "image": "s2_125",
+    "truth": "Food/Coffee/18",
+    "pred": "Food/Coffee/21",
+    "cause": "near_identical_variant",
+    "score": 0.9128422737121582
+  },
+  {
+    "i": 224,
+    "image": "s2_125",
+    "truth": "Food/Coffee/9",
+    "pred": "Food/Coffee/7",
+    "cause": "near_identical_variant",
+    "score": 0.9408503174781799
+  },
+  {
+    "i": 229,
+    "image": "s2_125",
+    "truth": "Food/Coffee/18",
+    "pred": "Food/Coffee/20",
+    "cause": "near_identical_variant",
+    "score": 0.8832904100418091
+  },
+  {
+    "i": 236,
+    "image": "s2_129",
+    "truth": "Food/Coffee/42",
+    "pred": "Food/Coffee/43",
+    "cause": "near_identical_variant",
+    "score": 0.9116858839988708
+  },
+  {
+    "i": 241,
+    "image": "s2_129",
+    "truth": "Food/Coffee/42",
+    "pred": "Food/Coffee/43",
+    "cause": "near_identical_variant",
+    "score": 0.754489004611969
+  },
+  {
+    "i": 246,
+    "image": "s2_140",
+    "truth": "Food/Coffee/7",
+    "pred": "Food/Coffee/9",
+    "cause": "near_identical_variant",
+    "score": 0.9395380020141602
+  },
+  {
+    "i": 248,
+    "image": "s2_140",
+    "truth": "Food/Coffee/7",
+    "pred": "Food/Coffee/9",
+    "cause": "near_identical_variant",
+    "score": 0.9221456050872803
+  },
+  {
+    "i": 249,
+    "image": "s2_140",
+    "truth": "Food/Coffee/7",
+    "pred": "Food/Coffee/9",
+    "cause": "near_identical_variant",
+    "score": 0.8076334595680237
+  },
+  {
+    "i": 252,
+    "image": "s2_140",
+    "truth": "Food/Coffee/7",
+    "pred": "Food/Coffee/9",
+    "cause": "near_identical_variant",
+    "score": 0.9156063795089722
+  },
+  {
+    "i": 256,
+    "image": "s3_5",
+    "truth": "Food/Chips/44",
+    "pred": "Food/Chips/56",
+    "cause": "near_identical_variant",
+    "score": 0.7492973804473877
+  },
+  {
+    "i": 257,
+    "image": "s3_5",
+    "truth": "Food/Chips/43",
+    "pred": "Food/Chips/48",
+    "cause": "near_identical_variant",
+    "score": 0.7377562522888184
+  },
+  {
+    "i": 260,
+    "image": "s3_5",
+    "truth": "Food/Chips/43",
+    "pred": "Food/Chips/42",
+    "cause": "near_identical_variant",
+    "score": 0.7822684049606323
+  },
+  {
+    "i": 268,
+    "image": "s3_95",
+    "truth": "Food/Drinks/Juices/85",
+    "pred": "Food/Drinks/Juices/163",
+    "cause": "near_identical_variant",
+    "score": 0.7913568019866943
+  },
+  {
+    "i": 282,
+    "image": "s3_95",
+    "truth": "Food/Drinks/Juices/85",
+    "pred": "Food/Drinks/Juices/86",
+    "cause": "near_identical_variant",
+    "score": 0.7990760207176208
+  },
+  {
+    "i": 287,
+    "image": "s3_95",
+    "truth": "Food/Drinks/Juices/85",
+    "pred": "Food/Drinks/Juices/86",
+    "cause": "near_identical_variant",
+    "score": 0.8158285617828369
+  },
+  {
+    "i": 305,
+    "image": "s3_110",
+    "truth": "Food/Rice/19",
+    "pred": "Food/Rice/37",
+    "cause": "near_identical_variant",
+    "score": 0.9183728098869324
+  },
+  {
+    "i": 317,
+    "image": "s3_112",
+    "truth": "Food/Rice/19",
+    "pred": "Food/Rice/37",
+    "cause": "near_identical_variant",
+    "score": 0.9213336706161499
+  },
+  {
+    "i": 338,
+    "image": "s3_117",
+    "truth": "Food/Rice/19",
+    "pred": "Food/Rice/37",
+    "cause": "near_identical_variant",
+    "score": 0.8400795459747314
+  },
+  {
+    "i": 346,
+    "image": "s3_117",
+    "truth": "Food/Rice/19",
+    "pred": "Food/Rice/37",
+    "cause": "near_identical_variant",
+    "score": 0.9490253925323486
+  },
+  {
+    "i": 380,
+    "image": "s3_167",
+    "truth": "Food/Drinks/Choco/12",
+    "pred": "Food/Drinks/Choco/49",
+    "cause": "near_identical_variant",
+    "score": 0.9268312454223633
+  },
+  {
+    "i": 384,
+    "image": "s3_167",
+    "truth": "Food/Drinks/Choco/12",
+    "pred": "Food/Drinks/Choco/49",
+    "cause": "near_identical_variant",
+    "score": 0.9459775686264038
+  },
+  {
+    "i": 398,
+    "image": "s3_190",
+    "truth": "Food/Pasta/16",
+    "pred": "Food/Pasta/17",
+    "cause": "near_identical_variant",
+    "score": 0.8850940465927124
+  },
+  {
+    "i": 465,
+    "image": "s3_256",
+    "truth": "Food/Candy/Chocolate/24",
+    "pred": "Food/DriedFruitsAndNuts/69",
+    "cause": "cross_category_confusion",
+    "score": 0.7685826420783997
+  },
+  {
+    "i": 474,
+    "image": "s3_256",
+    "truth": "Food/Candy/Chocolate/24",
+    "pred": "Food/Candy/Chocolate/25",
+    "cause": "same_subcategory_confusion",
+    "score": 0.8076151609420776
+  },
+  {
+    "i": 484,
+    "image": "s3_261",
+    "truth": "Food/Candy/Chocolate/44",
+    "pred": "Food/Candy/Chocolate/58",
+    "cause": "near_identical_variant",
+    "score": 0.8595191240310669
+  },
+  {
+    "i": 485,
+    "image": "s3_261",
+    "truth": "Food/Candy/Chocolate/44",
+    "pred": "Food/Candy/Chocolate/58",
+    "cause": "near_identical_variant",
+    "score": 0.8589428067207336
+  },
+  {
+    "i": 486,
+    "image": "s3_261",
+    "truth": "Food/Candy/Chocolate/44",
+    "pred": "Food/Candy/Chocolate/58",
+    "cause": "near_identical_variant",
+    "score": 0.8751000165939331
+  },
+  {
+    "i": 493,
+    "image": "s3_262",
+    "truth": "Food/Candy/Chocolate/103",
+    "pred": "Food/Candy/Chocolate/122",
+    "cause": "near_identical_variant",
+    "score": 0.7452319264411926
+  },
+  {
+    "i": 497,
+    "image": "s3_262",
+    "truth": "Food/Candy/Chocolate/33",
+    "pred": "Food/Candy/Chocolate/88",
+    "cause": "near_identical_variant",
+    "score": 0.9118704199790955
+  },
+  {
+    "i": 498,
+    "image": "s3_262",
+    "truth": "Food/Candy/Chocolate/34",
+    "pred": "Food/Candy/Chocolate/45",
+    "cause": "extreme_aspect_or_partial",
+    "score": 0.9234347939491272
+  },
+  {
+    "i": 499,
+    "image": "s3_262",
+    "truth": "Food/Candy/Chocolate/34",
+    "pred": "Food/Candy/Chocolate/45",
+    "cause": "near_identical_variant",
+    "score": 0.9350507855415344
+  },
+  {
+    "i": 500,
+    "image": "s3_262",
+    "truth": "Food/Candy/Chocolate/34",
+    "pred": "Food/Candy/Chocolate/45",
+    "cause": "near_identical_variant",
+    "score": 0.9366961717605591
+  },
+  {
+    "i": 501,
+    "image": "s3_262",
+    "truth": "Food/Candy/Chocolate/34",
+    "pred": "Food/Candy/Chocolate/45",
+    "cause": "near_identical_variant",
+    "score": 0.8081111907958984
+  },
+  {
+    "i": 516,
+    "image": "s3_269",
+    "truth": "Food/Rice/4",
+    "pred": "Food/Rice/5",
+    "cause": "same_subcategory_confusion",
+    "score": 0.887230634689331
+  },
+  {
+    "i": 517,
+    "image": "s3_269",
+    "truth": "Food/Rice/4",
+    "pred": "Food/Rice/5",
+    "cause": "same_subcategory_confusion",
+    "score": 0.9109351634979248
+  },
+  {
+    "i": 520,
+    "image": "s3_269",
+    "truth": "Food/Rice/4",
+    "pred": "Food/Rice/5",
+    "cause": "same_subcategory_confusion",
+    "score": 0.8714022636413574
+  },
+  {
+    "i": 521,
+    "image": "s3_269",
+    "truth": "Food/Rice/4",
+    "pred": "Food/Rice/5",
+    "cause": "same_subcategory_confusion",
+    "score": 0.9143300652503967
+  },
+  {
+    "i": 524,
+    "image": "s3_269",
+    "truth": "Food/Rice/4",
+    "pred": "Food/Rice/5",
+    "cause": "same_subcategory_confusion",
+    "score": 0.9324482679367065
+  },
+  {
+    "i": 532,
+    "image": "s3_270",
+    "truth": "Food/Rice/13",
+    "pred": "Food/Rice/34",
+    "cause": "same_subcategory_confusion",
+    "score": 0.7911009192466736
+  },
+  {
+    "i": 564,
+    "image": "s5_72",
+    "truth": "Food/Biscuits/74",
+    "pred": "Food/Biscuits/78",
+    "cause": "near_identical_variant",
+    "score": 0.9071393013000488
+  },
+  {
+    "i": 566,
+    "image": "s5_72",
+    "truth": "Food/Biscuits/74",
+    "pred": "Food/Biscuits/78",
+    "cause": "near_identical_variant",
+    "score": 0.8798158168792725
+  },
+  {
+    "i": 577,
+    "image": "s5_72",
+    "truth": "Food/Biscuits/74",
+    "pred": "Food/Biscuits/69",
+    "cause": "near_identical_variant",
+    "score": 0.8562146425247192
+  },
+  {
+    "i": 582,
+    "image": "s5_72",
+    "truth": "Food/Biscuits/74",
+    "pred": "Food/Biscuits/75",
+    "cause": "near_identical_variant",
+    "score": 0.8571414947509766
+  }
+]

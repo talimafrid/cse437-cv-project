@@ -1,0 +1,268 @@
+[transformers] Model config: bos_token_id must be `None` or an integer within the vocabulary (between 0 and 31999), got 49406. This may result in unexpected behavior.
+[transformers] Model config: eos_token_id must be `None` or an integer within the vocabulary (between 0 and 31999), got 49407. This may result in unexpected behavior.
+Loading weights:   0%|          | 0/408 [00:00<?, ?it/s]Loading weights:   7%|7         | 29/408 [00:00<00:01, 289.88it/s]Loading weights:  20%|##        | 83/408 [00:00<00:00, 408.67it/s]Loading weights:  31%|###       | 126/408 [00:00<00:00, 405.12it/s]Loading weights:  41%|####      | 167/408 [00:00<00:00, 267.19it/s]Loading weights: 100%|##########| 408/408 [00:00<00:00, 716.98it/s]
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+WARNING 'half' is deprecated and will be removed in the future. Use 'quantize' instead.
+{'delta': 0.0, 'min_inliers': 8, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.7992, 'false_alarm_rate': 0.1088, 'compliance_on_original_planograms': 0.8793, 'viol_detected': 195, 'viol_total': 244, 'false_alarms': 149, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 8, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.8443, 'false_alarm_rate': 0.3175, 'compliance_on_original_planograms': 0.6612, 'viol_detected': 206, 'viol_total': 244, 'false_alarms': 435, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 8, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.7828, 'false_alarm_rate': 0.0825, 'compliance_on_original_planograms': 0.8812, 'viol_detected': 191, 'viol_total': 244, 'false_alarms': 113, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 8, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.8156, 'false_alarm_rate': 0.1876, 'compliance_on_original_planograms': 0.7923, 'viol_detected': 199, 'viol_total': 244, 'false_alarms': 257, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 8, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.7869, 'false_alarm_rate': 0.0956, 'compliance_on_original_planograms': 0.8715, 'viol_detected': 192, 'viol_total': 244, 'false_alarms': 131, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 8, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.8156, 'false_alarm_rate': 0.1599, 'compliance_on_original_planograms': 0.819, 'viol_detected': 199, 'viol_total': 244, 'false_alarms': 219, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 12, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.873, 'false_alarm_rate': 0.1409, 'compliance_on_original_planograms': 0.8605, 'viol_detected': 213, 'viol_total': 244, 'false_alarms': 193, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 12, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.918, 'false_alarm_rate': 0.365, 'compliance_on_original_planograms': 0.63, 'viol_detected': 224, 'viol_total': 244, 'false_alarms': 500, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 12, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.8566, 'false_alarm_rate': 0.1182, 'compliance_on_original_planograms': 0.8562, 'viol_detected': 209, 'viol_total': 244, 'false_alarms': 162, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 12, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.8934, 'false_alarm_rate': 0.2153, 'compliance_on_original_planograms': 0.7728, 'viol_detected': 218, 'viol_total': 244, 'false_alarms': 295, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 12, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.8689, 'false_alarm_rate': 0.1263, 'compliance_on_original_planograms': 0.8488, 'viol_detected': 212, 'viol_total': 244, 'false_alarms': 173, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 12, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.8852, 'false_alarm_rate': 0.1978, 'compliance_on_original_planograms': 0.7888, 'viol_detected': 216, 'viol_total': 244, 'false_alarms': 271, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 20, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.9098, 'false_alarm_rate': 0.1628, 'compliance_on_original_planograms': 0.8495, 'viol_detected': 222, 'viol_total': 244, 'false_alarms': 223, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 20, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.9303, 'false_alarm_rate': 0.4073, 'compliance_on_original_planograms': 0.5668, 'viol_detected': 227, 'viol_total': 244, 'false_alarms': 558, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 20, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.8893, 'false_alarm_rate': 0.1336, 'compliance_on_original_planograms': 0.8386, 'viol_detected': 217, 'viol_total': 244, 'false_alarms': 183, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 20, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.9344, 'false_alarm_rate': 0.2642, 'compliance_on_original_planograms': 0.752, 'viol_detected': 228, 'viol_total': 244, 'false_alarms': 362, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 20, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.873, 'false_alarm_rate': 0.1569, 'compliance_on_original_planograms': 0.8212, 'viol_detected': 213, 'viol_total': 244, 'false_alarms': 215, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 20, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.918, 'false_alarm_rate': 0.2321, 'compliance_on_original_planograms': 0.7485, 'viol_detected': 224, 'viol_total': 244, 'false_alarms': 318, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 1000, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.9221, 'false_alarm_rate': 0.2679, 'compliance_on_original_planograms': 0.703, 'viol_detected': 225, 'viol_total': 244, 'false_alarms': 367, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 1000, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.9508, 'false_alarm_rate': 0.4854, 'compliance_on_original_planograms': 0.4817, 'viol_detected': 232, 'viol_total': 244, 'false_alarms': 665, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 1000, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.918, 'false_alarm_rate': 0.2226, 'compliance_on_original_planograms': 0.7389, 'viol_detected': 224, 'viol_total': 244, 'false_alarms': 305, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 1000, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.9467, 'false_alarm_rate': 0.3606, 'compliance_on_original_planograms': 0.6002, 'viol_detected': 231, 'viol_total': 244, 'false_alarms': 494, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 1000, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.9221, 'false_alarm_rate': 0.2628, 'compliance_on_original_planograms': 0.6896, 'viol_detected': 225, 'viol_total': 244, 'false_alarms': 360, 'unchanged_total': 1370}
+{'delta': 0.0, 'min_inliers': 1000, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.9385, 'false_alarm_rate': 0.3248, 'compliance_on_original_planograms': 0.631, 'viol_detected': 229, 'viol_total': 244, 'false_alarms': 445, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 8, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.791, 'false_alarm_rate': 0.0927, 'compliance_on_original_planograms': 0.8952, 'viol_detected': 193, 'viol_total': 244, 'false_alarms': 127, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 8, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.8361, 'false_alarm_rate': 0.3066, 'compliance_on_original_planograms': 0.6631, 'viol_detected': 204, 'viol_total': 244, 'false_alarms': 420, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 8, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.7705, 'false_alarm_rate': 0.0745, 'compliance_on_original_planograms': 0.887, 'viol_detected': 188, 'viol_total': 244, 'false_alarms': 102, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 8, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.8074, 'false_alarm_rate': 0.181, 'compliance_on_original_planograms': 0.7942, 'viol_detected': 197, 'viol_total': 244, 'false_alarms': 248, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 8, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.7746, 'false_alarm_rate': 0.0861, 'compliance_on_original_planograms': 0.8745, 'viol_detected': 189, 'viol_total': 244, 'false_alarms': 118, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 8, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.8074, 'false_alarm_rate': 0.1511, 'compliance_on_original_planograms': 0.8219, 'viol_detected': 197, 'viol_total': 244, 'false_alarms': 207, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 12, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.8648, 'false_alarm_rate': 0.1248, 'compliance_on_original_planograms': 0.8784, 'viol_detected': 211, 'viol_total': 244, 'false_alarms': 171, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 12, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.9057, 'false_alarm_rate': 0.3314, 'compliance_on_original_planograms': 0.6518, 'viol_detected': 221, 'viol_total': 244, 'false_alarms': 454, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 12, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.8443, 'false_alarm_rate': 0.0934, 'compliance_on_original_planograms': 0.8793, 'viol_detected': 206, 'viol_total': 244, 'false_alarms': 128, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 12, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.8811, 'false_alarm_rate': 0.1956, 'compliance_on_original_planograms': 0.7868, 'viol_detected': 215, 'viol_total': 244, 'false_alarms': 268, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 12, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.8484, 'false_alarm_rate': 0.1051, 'compliance_on_original_planograms': 0.8706, 'viol_detected': 207, 'viol_total': 244, 'false_alarms': 144, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 12, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.877, 'false_alarm_rate': 0.1766, 'compliance_on_original_planograms': 0.7969, 'viol_detected': 214, 'viol_total': 244, 'false_alarms': 242, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 20, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.8934, 'false_alarm_rate': 0.1285, 'compliance_on_original_planograms': 0.8721, 'viol_detected': 218, 'viol_total': 244, 'false_alarms': 176, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 20, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.9221, 'false_alarm_rate': 0.3584, 'compliance_on_original_planograms': 0.6378, 'viol_detected': 225, 'viol_total': 244, 'false_alarms': 491, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 20, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.8689, 'false_alarm_rate': 0.1036, 'compliance_on_original_planograms': 0.8712, 'viol_detected': 212, 'viol_total': 244, 'false_alarms': 142, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 20, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.9221, 'false_alarm_rate': 0.2131, 'compliance_on_original_planograms': 0.7805, 'viol_detected': 225, 'viol_total': 244, 'false_alarms': 292, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 20, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.8648, 'false_alarm_rate': 0.1197, 'compliance_on_original_planograms': 0.8614, 'viol_detected': 211, 'viol_total': 244, 'false_alarms': 164, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 20, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.9139, 'false_alarm_rate': 0.1869, 'compliance_on_original_planograms': 0.7888, 'viol_detected': 223, 'viol_total': 244, 'false_alarms': 256, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 1000, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.9262, 'false_alarm_rate': 0.1752, 'compliance_on_original_planograms': 0.8086, 'viol_detected': 226, 'viol_total': 244, 'false_alarms': 240, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 1000, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.9426, 'false_alarm_rate': 0.4095, 'compliance_on_original_planograms': 0.5625, 'viol_detected': 230, 'viol_total': 244, 'false_alarms': 561, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 1000, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.9139, 'false_alarm_rate': 0.1547, 'compliance_on_original_planograms': 0.7973, 'viol_detected': 223, 'viol_total': 244, 'false_alarms': 212, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 1000, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.9426, 'false_alarm_rate': 0.2599, 'compliance_on_original_planograms': 0.7178, 'viol_detected': 230, 'viol_total': 244, 'false_alarms': 356, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 1000, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.9098, 'false_alarm_rate': 0.1737, 'compliance_on_original_planograms': 0.7839, 'viol_detected': 222, 'viol_total': 244, 'false_alarms': 238, 'unchanged_total': 1370}
+{'delta': 0.02, 'min_inliers': 1000, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.9385, 'false_alarm_rate': 0.2496, 'compliance_on_original_planograms': 0.7078, 'viol_detected': 229, 'viol_total': 244, 'false_alarms': 342, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 8, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.7705, 'false_alarm_rate': 0.0715, 'compliance_on_original_planograms': 0.8991, 'viol_detected': 188, 'viol_total': 244, 'false_alarms': 98, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 8, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.832, 'false_alarm_rate': 0.2869, 'compliance_on_original_planograms': 0.6752, 'viol_detected': 203, 'viol_total': 244, 'false_alarms': 393, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 8, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.75, 'false_alarm_rate': 0.0584, 'compliance_on_original_planograms': 0.8951, 'viol_detected': 183, 'viol_total': 244, 'false_alarms': 80, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 8, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.8033, 'false_alarm_rate': 0.1737, 'compliance_on_original_planograms': 0.7884, 'viol_detected': 196, 'viol_total': 244, 'false_alarms': 238, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 8, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.7582, 'false_alarm_rate': 0.0672, 'compliance_on_original_planograms': 0.8835, 'viol_detected': 185, 'viol_total': 244, 'false_alarms': 92, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 8, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.7992, 'false_alarm_rate': 0.1423, 'compliance_on_original_planograms': 0.8164, 'viol_detected': 195, 'viol_total': 244, 'false_alarms': 195, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 12, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.8402, 'false_alarm_rate': 0.0876, 'compliance_on_original_planograms': 0.8972, 'viol_detected': 205, 'viol_total': 244, 'false_alarms': 120, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 12, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.877, 'false_alarm_rate': 0.3007, 'compliance_on_original_planograms': 0.6687, 'viol_detected': 214, 'viol_total': 244, 'false_alarms': 412, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 12, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.8238, 'false_alarm_rate': 0.0679, 'compliance_on_original_planograms': 0.8904, 'viol_detected': 201, 'viol_total': 244, 'false_alarms': 93, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 12, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.8607, 'false_alarm_rate': 0.1839, 'compliance_on_original_planograms': 0.782, 'viol_detected': 210, 'viol_total': 244, 'false_alarms': 252, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 12, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.8115, 'false_alarm_rate': 0.0796, 'compliance_on_original_planograms': 0.8783, 'viol_detected': 198, 'viol_total': 244, 'false_alarms': 109, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 12, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.8525, 'false_alarm_rate': 0.1555, 'compliance_on_original_planograms': 0.7924, 'viol_detected': 208, 'viol_total': 244, 'false_alarms': 213, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 20, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.877, 'false_alarm_rate': 0.0876, 'compliance_on_original_planograms': 0.8972, 'viol_detected': 214, 'viol_total': 244, 'false_alarms': 120, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 20, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.9016, 'false_alarm_rate': 0.3058, 'compliance_on_original_planograms': 0.6687, 'viol_detected': 220, 'viol_total': 244, 'false_alarms': 419, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 20, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.8607, 'false_alarm_rate': 0.0679, 'compliance_on_original_planograms': 0.8884, 'viol_detected': 210, 'viol_total': 244, 'false_alarms': 93, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 20, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.9016, 'false_alarm_rate': 0.1964, 'compliance_on_original_planograms': 0.782, 'viol_detected': 220, 'viol_total': 244, 'false_alarms': 269, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 20, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.8566, 'false_alarm_rate': 0.0781, 'compliance_on_original_planograms': 0.8763, 'viol_detected': 209, 'viol_total': 244, 'false_alarms': 107, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 20, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.8893, 'false_alarm_rate': 0.1628, 'compliance_on_original_planograms': 0.7905, 'viol_detected': 217, 'viol_total': 244, 'false_alarms': 223, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 1000, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.8975, 'false_alarm_rate': 0.0949, 'compliance_on_original_planograms': 0.8916, 'viol_detected': 219, 'viol_total': 244, 'false_alarms': 130, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 1000, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.9221, 'false_alarm_rate': 0.3139, 'compliance_on_original_planograms': 0.6631, 'viol_detected': 225, 'viol_total': 244, 'false_alarms': 430, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 1000, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.8893, 'false_alarm_rate': 0.081, 'compliance_on_original_planograms': 0.8717, 'viol_detected': 217, 'viol_total': 244, 'false_alarms': 111, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 1000, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.918, 'false_alarm_rate': 0.2095, 'compliance_on_original_planograms': 0.7764, 'viol_detected': 224, 'viol_total': 244, 'false_alarms': 287, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 1000, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.8811, 'false_alarm_rate': 0.0949, 'compliance_on_original_planograms': 0.8555, 'viol_detected': 215, 'viol_total': 244, 'false_alarms': 130, 'unchanged_total': 1370}
+{'delta': 0.05, 'min_inliers': 1000, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.9098, 'false_alarm_rate': 0.1788, 'compliance_on_original_planograms': 0.7738, 'viol_detected': 222, 'viol_total': 244, 'false_alarms': 245, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 8, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.6844, 'false_alarm_rate': 0.0518, 'compliance_on_original_planograms': 0.9046, 'viol_detected': 167, 'viol_total': 244, 'false_alarms': 71, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 8, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.791, 'false_alarm_rate': 0.2723, 'compliance_on_original_planograms': 0.6718, 'viol_detected': 193, 'viol_total': 244, 'false_alarms': 373, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 8, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.6803, 'false_alarm_rate': 0.046, 'compliance_on_original_planograms': 0.9021, 'viol_detected': 166, 'viol_total': 244, 'false_alarms': 63, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 8, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.7459, 'false_alarm_rate': 0.1511, 'compliance_on_original_planograms': 0.7901, 'viol_detected': 182, 'viol_total': 244, 'false_alarms': 207, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 8, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.6885, 'false_alarm_rate': 0.0496, 'compliance_on_original_planograms': 0.8966, 'viol_detected': 168, 'viol_total': 244, 'false_alarms': 68, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 8, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.75, 'false_alarm_rate': 0.1234, 'compliance_on_original_planograms': 0.8222, 'viol_detected': 183, 'viol_total': 244, 'false_alarms': 169, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 12, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.7418, 'false_alarm_rate': 0.0693, 'compliance_on_original_planograms': 0.9001, 'viol_detected': 181, 'viol_total': 244, 'false_alarms': 95, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 12, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.8443, 'false_alarm_rate': 0.281, 'compliance_on_original_planograms': 0.6653, 'viol_detected': 206, 'viol_total': 244, 'false_alarms': 385, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 12, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.7295, 'false_alarm_rate': 0.0569, 'compliance_on_original_planograms': 0.8955, 'viol_detected': 178, 'viol_total': 244, 'false_alarms': 78, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 12, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.7992, 'false_alarm_rate': 0.1577, 'compliance_on_original_planograms': 0.7837, 'viol_detected': 195, 'viol_total': 244, 'false_alarms': 216, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 12, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.7295, 'false_alarm_rate': 0.0569, 'compliance_on_original_planograms': 0.8927, 'viol_detected': 178, 'viol_total': 244, 'false_alarms': 78, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 12, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.7951, 'false_alarm_rate': 0.1372, 'compliance_on_original_planograms': 0.8139, 'viol_detected': 194, 'viol_total': 244, 'false_alarms': 188, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 20, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.7746, 'false_alarm_rate': 0.0701, 'compliance_on_original_planograms': 0.9001, 'viol_detected': 189, 'viol_total': 244, 'false_alarms': 96, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 20, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.8566, 'false_alarm_rate': 0.2825, 'compliance_on_original_planograms': 0.6653, 'viol_detected': 209, 'viol_total': 244, 'false_alarms': 387, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 20, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.7705, 'false_alarm_rate': 0.0562, 'compliance_on_original_planograms': 0.8936, 'viol_detected': 188, 'viol_total': 244, 'false_alarms': 77, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 20, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.8238, 'false_alarm_rate': 0.162, 'compliance_on_original_planograms': 0.7837, 'viol_detected': 201, 'viol_total': 244, 'false_alarms': 222, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 20, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.7705, 'false_alarm_rate': 0.0569, 'compliance_on_original_planograms': 0.8908, 'viol_detected': 188, 'viol_total': 244, 'false_alarms': 78, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 20, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.8238, 'false_alarm_rate': 0.1423, 'compliance_on_original_planograms': 0.8119, 'viol_detected': 201, 'viol_total': 244, 'false_alarms': 195, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 1000, 'gap_cost': 0.4, 'end_cost': 0.1, 'detected_rate': 0.791, 'false_alarm_rate': 0.0708, 'compliance_on_original_planograms': 0.9001, 'viol_detected': 193, 'viol_total': 244, 'false_alarms': 97, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 1000, 'gap_cost': 0.4, 'end_cost': 0.3, 'detected_rate': 0.873, 'false_alarm_rate': 0.2847, 'compliance_on_original_planograms': 0.6582, 'viol_detected': 213, 'viol_total': 244, 'false_alarms': 390, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 1000, 'gap_cost': 0.6, 'end_cost': 0.1, 'detected_rate': 0.791, 'false_alarm_rate': 0.0584, 'compliance_on_original_planograms': 0.8936, 'viol_detected': 193, 'viol_total': 244, 'false_alarms': 80, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 1000, 'gap_cost': 0.6, 'end_cost': 0.3, 'detected_rate': 0.8238, 'false_alarm_rate': 0.1591, 'compliance_on_original_planograms': 0.7908, 'viol_detected': 201, 'viol_total': 244, 'false_alarms': 218, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 1000, 'gap_cost': 0.8, 'end_cost': 0.1, 'detected_rate': 0.7869, 'false_alarm_rate': 0.0591, 'compliance_on_original_planograms': 0.8908, 'viol_detected': 192, 'viol_total': 244, 'false_alarms': 81, 'unchanged_total': 1370}
+{'delta': 0.1, 'min_inliers': 1000, 'gap_cost': 0.8, 'end_cost': 0.3, 'detected_rate': 0.8361, 'false_alarm_rate': 0.1394, 'compliance_on_original_planograms': 0.8191, 'viol_detected': 204, 'viol_total': 244, 'false_alarms': 191, 'unchanged_total': 1370}
+{
+ "tune_compliance_val": {
+  "grid": [
+   {
+    "delta": 0.0,
+    "min_inliers": 8,
+    "gap_cost": 0.4,
+    "end_cost": 0.1,
+    "detected_rate": 0.7992,
+    "false_alarm_rate": 0.1088,
+    "compliance_on_original_planograms": 0.8793,
+    "viol_detected": 195,
+    "viol_total": 244,
+    "false_alarms": 149,
+    "unchanged_total": 1370
+   },
+   {
+    "delta": 0.0,
+    "min_inliers": 8,
+    "gap_cost": 0.4,
+    "end_cost": 0.3,
+    "detected_rate": 0.8443,
+    "false_alarm_rate": 0.3175,
+    "compliance_on_original_planograms": 0.6612,
+    "viol_detected": 206,
+    "viol_total": 244,
+    "false_alarms": 435,
+    "unchanged_total": 1370
+   },
+   {
+    "delta": 0.0,
+    "min_inliers": 8,
+    "gap_cost": 0.6,
+    "end_cost": 0.1,
+    "detected_rate": 0.7828,
+    "false_alarm_rate": 0.0825,
+    "compliance_on_original_planograms": 0.8812,
+    "viol_detected": 191,
+    "viol_total": 244,
+    "false_alarms": 113,
+    "unchanged_total": 1370
+   },
+   {
+    "delta": 0.0,
+    "min_inliers": 8,
+    "gap_cost": 0.6,
+    "end_cost": 0.3,
+    "detected_rate": 0.8156,
+    "false_alarm_rate": 0.1876,
+    "compliance_on_original_planograms": 0.7923,
+    "viol_detected": 199,
+    "viol_total": 244,
+    "false_alarms": 257,
+    "unchanged_total": 1370
+   },
+   {
+    "delta": 0.0,
+    "min_inliers": 8,
+    "gap_cost": 0.8,
+    "end_cost": 0.1,
+    "detected_rate": 0.7869,
+    "false_alarm_rate": 0.0956,
+    "compliance_on_original_planograms": 0.8715,
+    "viol_detected": 192,
+    "viol_total": 244,
+    "false_alarms": 131,
+    "unchanged_total": 1370
+   },
+   {
+    "delta": 0.0,
+    "min_inliers": 8,
+    "gap_cost": 0.8,
+    "end_cost": 0.3,
+    "detected_rate": 0.8156,
+    "false_alarm_rate": 0.1599,
+    "compliance_on_original_planograms": 0.819,
+    "viol_detected": 199,
+    "viol_total": 244,
+    "false_alarms": 219,
+    "unchanged_total": 1370
+   },
+   {
+    "delta": 0.0,
+    "min_inliers": 12,
+    "gap_cost": 0.4,
+    "end_cost": 0.1,
+    "detected_rate": 0.873,
+    "false_alarm_rate": 0.1409,
+    "compliance_on_original_planograms": 0.8605,
+    "viol_detected": 213,
+    "viol_total": 244,
+    "false_alarms": 193,
+    "unchanged_total": 1370
+   },
+   {
+    "delta": 0.0,
+    "min_inliers": 12,
+    "gap_cost": 0.4,
+    "end_cost": 0.3,
+    "detected_rate": 0.918,
+    "false_alarm_rate": 0.365,
+    "compliance_on_original_planograms": 0.63,
+    "viol_detected": 224,
+    "viol_total": 244,
+    "false_alarms": 500,
+    "unchanged_total": 1370
+   },
+   {
+    "delta": 0.0,
+    "min_inliers": 12,
+    "gap_cost": 0.6,
+    "end_cost": 0.1,
+    "detected_rate": 0.8566,
+    "false_alarm_rate": 0.1182,
+    "compliance_on_original_planograms": 0.8562,
+    "viol_detected": 209,
+    "viol_total": 244,
+    "false_alarms": 162,
+    "unchanged_total": 1370
+   },
+   {
+    "delta": 0.0,
+    "min_inliers": 12,
+    "gap_cost": 0.6,
+    "end_cost": 0.3,
+    "detected_rate": 0.8934,
+    "false_alarm_rate": 0.2153,
+    "compliance_on_original_planograms": 0.7728,
+    "viol_detected":

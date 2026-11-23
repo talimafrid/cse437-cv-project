@@ -1,0 +1,30 @@
+{
+  "image": "s3_179",
+  "n_annotated_boxes": 18,
+  "rows": [
+    [
+      "Food/Dairy/Creme/48",
+      "Food/Dairy/Creme/48",
+      "Food/Dairy/Creme/48",
+      "Food/Dairy/Creme/48"
+    ],
+    [
+      "Food/Dairy/Creme/50",
+      "Food/Dairy/Creme/50",
+      "Food/Dairy/Creme/50",
+      "Food/Dairy/Creme/50"
+    ],
+    [
+      "Food/Drinks/Choco/15",
+      "Food/Drinks/Choco/15",
+      "Food/Drinks/Choco/15",
+      "Food/Drinks/Choco/15",
+      "Food/Drinks/Choco/15",
+      "Food/Drinks/Choco/15",
+      "Food/Drinks/Choco/15",
+      "Food/Drinks/Choco/15",
+      "Food/Drinks/Choco/15",
+      "Food/Drinks/Choco/15"
+    ]
+  ]
+}

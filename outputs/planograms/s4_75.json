@@ -1,0 +1,27 @@
+{
+  "image": "s4_75",
+  "n_annotated_boxes": 15,
+  "rows": [
+    [
+      "Food/Dairy/Yoghurt/166",
+      "Food/Dairy/Yoghurt/173",
+      "Food/Dairy/Yoghurt/173",
+      "Food/Dairy/Yoghurt/172",
+      "Food/Dairy/Yoghurt/172"
+    ],
+    [
+      "Food/Dairy/Yoghurt/166",
+      "Food/Dairy/Yoghurt/173",
+      "Food/Dairy/Yoghurt/173",
+      "Food/Dairy/Yoghurt/172",
+      "Food/Dairy/Yoghurt/172"
+    ],
+    [
+      "Food/Dairy/Yoghurt/166",
+      "Food/Dairy/Yoghurt/173",
+      "Food/Dairy/Yoghurt/173",
+      "Food/Dairy/Yoghurt/172",
+      "Food/Dairy/Yoghurt/172"
+    ]
+  ]
+}

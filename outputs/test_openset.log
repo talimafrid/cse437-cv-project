@@ -1,0 +1,21 @@
+{
+ "A4_openset": {
+  "n_known": 499,
+  "n_unknown": 91,
+  "unknown_rejected": 0.1319,
+  "known_top1_before": 0.8958,
+  "known_top1_after": 0.8798,
+  "known_top1_drop_pp": 1.6,
+  "auroc_known_vs_unknown": 0.7903,
+  "threshold": 0.5131,
+  "targets": {
+   "unknown_rejected": 0.7,
+   "max_drop_pp": 5
+  },
+  "ablation_cosine_only": {
+   "threshold": 0.7801,
+   "unknown_rejected": 0.2198,
+   "known_top1_drop_pp": 3.81
+  }
+ }
+}

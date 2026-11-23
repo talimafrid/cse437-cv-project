@@ -1,0 +1,37 @@
+{
+  "image": "s2_8",
+  "n_annotated_boxes": 17,
+  "rows": [
+    [
+      "Food/Tea/48",
+      "Food/Tea/48"
+    ],
+    [
+      "Food/Tea/48",
+      "Food/Tea/48",
+      "Food/Tea/48"
+    ],
+    [
+      "Food/Tea/50",
+      "Food/Tea/50",
+      "Food/Tea/50"
+    ],
+    [
+      "Food/Tea/50",
+      "Food/Tea/50",
+      "Food/Tea/50"
+    ],
+    [
+      "Food/Tea/49",
+      "Food/Tea/49",
+      "Food/Tea/49"
+    ],
+    [
+      "Food/Tea/49"
+    ],
+    [
+      "Food/Tea/49",
+      "Food/Tea/49"
+    ]
+  ]
+}

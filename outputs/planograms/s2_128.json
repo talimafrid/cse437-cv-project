@@ -1,0 +1,22 @@
+{
+  "image": "s2_128",
+  "n_annotated_boxes": 12,
+  "rows": [
+    [
+      "Food/Coffee/52",
+      "Food/Coffee/53",
+      "Food/Coffee/19",
+      "Food/Coffee/19",
+      "Food/Coffee/19",
+      "Food/Coffee/52"
+    ],
+    [
+      "Food/Coffee/18",
+      "Food/Coffee/23",
+      "Food/Coffee/23",
+      "Food/Coffee/23",
+      "Food/Coffee/85",
+      "Food/Coffee/85"
+    ]
+  ]
+}

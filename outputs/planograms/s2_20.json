@@ -1,0 +1,33 @@
+{
+  "image": "s2_20",
+  "n_annotated_boxes": 13,
+  "rows": [
+    [
+      "Food/Tea/14"
+    ],
+    [
+      "Food/Tea/49",
+      "Food/Tea/23"
+    ],
+    [
+      "Food/Tea/34"
+    ],
+    [
+      "Food/Tea/73",
+      "Food/Tea/34",
+      "Food/Tea/34"
+    ],
+    [
+      "Food/Tea/72",
+      "Food/Tea/72",
+      "Food/Tea/49"
+    ],
+    [
+      "Food/Tea/49"
+    ],
+    [
+      "Food/Tea/72",
+      "Food/Tea/72"
+    ]
+  ]
+}

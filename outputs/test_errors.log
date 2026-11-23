@@ -1,0 +1,11 @@
+{
+ "C7_recognition_errors": {
+  "n_errors": 82,
+  "by_cause": {
+   "near_identical_variant": 60,
+   "same_subcategory_confusion": 12,
+   "extreme_aspect_or_partial": 8,
+   "cross_category_confusion": 2
+  }
+ }
+}

@@ -1,0 +1,24 @@
+{
+  "image": "s3_5",
+  "n_annotated_boxes": 12,
+  "rows": [
+    [
+      "Food/Chips/44",
+      "Food/Chips/44",
+      "Food/Chips/44",
+      "Food/Chips/44"
+    ],
+    [
+      "Food/Chips/48",
+      "Food/Chips/48",
+      "Food/Chips/48",
+      "Food/Chips/48"
+    ],
+    [
+      "Food/Chips/43",
+      "Food/Chips/43",
+      "Food/Chips/43",
+      "Food/Chips/43"
+    ]
+  ]
+}

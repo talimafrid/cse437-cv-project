@@ -1,0 +1,13 @@
+{
+  "image": "s2_70",
+  "n_annotated_boxes": 5,
+  "rows": [
+    [
+      "Food/DriedFruitsAndNuts/86",
+      "Food/DriedFruitsAndNuts/86",
+      "Food/DriedFruitsAndNuts/89",
+      "Food/DriedFruitsAndNuts/89",
+      "Food/DriedFruitsAndNuts/89"
+    ]
+  ]
+}

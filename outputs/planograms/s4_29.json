@@ -1,0 +1,27 @@
+{
+  "image": "s4_29",
+  "n_annotated_boxes": 15,
+  "rows": [
+    [
+      "Food/Soups/79",
+      "Food/Soups/79",
+      "Food/Soups/80",
+      "Food/Soups/80",
+      "Food/Soups/80"
+    ],
+    [
+      "Food/Soups/5",
+      "Food/Soups/77",
+      "Food/Soups/77",
+      "Food/Soups/77",
+      "Food/Soups/2"
+    ],
+    [
+      "Food/Soups/10",
+      "Food/Soups/4",
+      "Food/Soups/4",
+      "Food/Soups/4",
+      "Food/Soups/78"
+    ]
+  ]
+}

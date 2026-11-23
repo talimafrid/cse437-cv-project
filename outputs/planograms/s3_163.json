@@ -1,0 +1,28 @@
+{
+  "image": "s3_163",
+  "n_annotated_boxes": 18,
+  "rows": [
+    [
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34",
+      "Food/Drinks/Milk/34"
+    ],
+    [
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29",
+      "Food/Drinks/Milk/29"
+    ]
+  ]
+}

@@ -4,7 +4,7 @@
 Every acceptance number (A1-A6) in `outputs/metrics.json` is produced by `scripts/evaluate.py` on frozen test splits, with tests passing and an honest gap note for any missed target.
 
 ## Next Step
-Commit on branch project5-run and summarise results and gaps to the user.
+All phases complete. Open: A4 miss, CPU latency, T4 latency, GroZi source [CHECK], browser click test of demo.
 
 ## Current Phase
 Phase 6
@@ -43,8 +43,8 @@ Phase 6
 ### Phase 6: Delivery
 - [x] Rewrite `src/app.py` (Gradio, F7/C11) on top of `Pipeline`/`Gallery` (audit + inject run headless end to end; demo planogram = GT layout; browser click test not done)
 - [x] Update README (datasets, versions, hardware, commands), mark PLAN.md as superseded where stale
-- [ ] Commit work; summarize results and gaps to user
-- **Status:** in_progress
+- [x] Commit work (e4b6dd54 on project5-run, not pushed); summarize results and gaps to user
+- **Status:** complete
 
 ## Decisions Made
 | Decision | Rationale |

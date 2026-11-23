@@ -37,3 +37,6 @@
 - tune_compliance (new protocol) picked delta 0.05, min_inliers 20, gap 0.6, end 0.1: val 0.861 det / 0.068 FA, base compliance 0.888.
 - README rewritten (real results, versions, data URLs, commands; GroZi source marked [CHECK]). PLAN.md marked superseded.
 - Test A5 0.848/0.094, A6 GPU 1.58 s, CPU 10.4 s, add-SKU 6.2 s, C7 82 errors. Demo audit verified headless; demo planogram switched to GT layout.
+
+## Session 2026-11-24
+- Demo launched and driven through its Gradio API (audit, inject, re-audit). Fix: app inject tab now uses localisable=True (same rule as A5). 50 test shelves: median compliance 100%; s1_28 (67.7%) is an outlier. Good live cases: s5_72 seed 0/2, s5_37 seed 2. Not committed.

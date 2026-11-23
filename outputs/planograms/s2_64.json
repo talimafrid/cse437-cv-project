@@ -1,0 +1,33 @@
+{
+  "image": "s2_64",
+  "n_annotated_boxes": 19,
+  "rows": [
+    [
+      "Food/Jars-Cans/Spreads/13",
+      "Food/Jars-Cans/Spreads/3",
+      "Food/Jars-Cans/Spreads/3",
+      "Food/Jars-Cans/Spreads/96",
+      "Food/Jars-Cans/Spreads/96",
+      "Food/Jars-Cans/Spreads/18"
+    ],
+    [
+      "Food/Jars-Cans/Spreads/3",
+      "Food/Jars-Cans/Spreads/3",
+      "Food/Jars-Cans/Spreads/96",
+      "Food/Jars-Cans/Spreads/96",
+      "Food/Jars-Cans/Spreads/18"
+    ],
+    [
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/1"
+    ],
+    [
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/21",
+      "Food/Jars-Cans/Spreads/1"
+    ]
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "image": "s3_260",
+  "n_annotated_boxes": 15,
+  "rows": [
+    [
+      "Food/Candy/Chocolate/13",
+      "Food/Candy/Chocolate/44",
+      "Food/Candy/Chocolate/36"
+    ],
+    [
+      "Food/Candy/Chocolate/118",
+      "Food/Candy/Chocolate/13",
+      "Food/Candy/Chocolate/44",
+      "Food/Candy/Chocolate/36"
+    ],
+    [
+      "Food/Candy/Chocolate/118",
+      "Food/Candy/Chocolate/13",
+      "Food/Candy/Chocolate/44",
+      "Food/Candy/Chocolate/36"
+    ],
+    [
+      "Food/Candy/Chocolate/118",
+      "Food/Candy/Chocolate/13",
+      "Food/Candy/Chocolate/44",
+      "Food/Candy/Chocolate/36"
+    ]
+  ]
+}

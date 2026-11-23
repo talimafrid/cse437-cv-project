@@ -1,0 +1,26 @@
+{
+  "image": "s3_253",
+  "n_annotated_boxes": 10,
+  "rows": [
+    [
+      "Food/Candy/Chocolate/14",
+      "Food/Candy/Chocolate/39"
+    ],
+    [
+      "Food/Candy/Chocolate/14",
+      "Food/Candy/Chocolate/39"
+    ],
+    [
+      "Food/Candy/Chocolate/14",
+      "Food/Candy/Chocolate/39"
+    ],
+    [
+      "Food/Candy/Chocolate/14",
+      "Food/Candy/Chocolate/39"
+    ],
+    [
+      "Food/Candy/Chocolate/14",
+      "Food/Candy/Chocolate/39"
+    ]
+  ]
+}

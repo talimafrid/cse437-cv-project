@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from pathlib import Path
 
@@ -88,7 +89,8 @@ def make_violations(plan_text: str, seed: float):
     rows = json.loads(plan_text)
     pool = sorted({s for r in rows for s in r}) if _pipe is None else pipe().gallery.skus
     vc = CFG["violations"]
-    new, truth = inject(rows, pool, int(seed), vc["rate_min"], vc["rate_max"], vc["ops"])
+    new, truth = inject(rows, pool, int(seed), vc["rate_min"], vc["rate_max"], vc["ops"],
+                       localisable=True)                      # same rule as A5: no edits between identical products
     return json.dumps(new, indent=1), json.dumps(truth["log"], indent=1)
 
 
@@ -130,4 +132,5 @@ def ui() -> gr.Blocks:
 
 
 if __name__ == "__main__":
-    ui().launch()
+    # host/port come from GRADIO_SERVER_NAME / GRADIO_SERVER_PORT (Gradio reads them itself)
+    ui().launch(inbrowser=os.getenv("OPEN_BROWSER") == "1")

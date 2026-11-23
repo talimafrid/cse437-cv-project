@@ -1,0 +1,20 @@
+{
+  "image": "s3_200",
+  "n_annotated_boxes": 10,
+  "rows": [
+    [
+      "Food/Pasta/60",
+      "Food/Pasta/60",
+      "Food/Pasta/60",
+      "Food/Pasta/16",
+      "Food/Pasta/16"
+    ],
+    [
+      "Food/Pasta/60",
+      "Food/Pasta/60",
+      "Food/Pasta/60",
+      "Food/Pasta/18",
+      "Food/Pasta/18"
+    ]
+  ]
+}

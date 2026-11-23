@@ -1,0 +1,29 @@
+{
+  "image": "s5_39",
+  "n_annotated_boxes": 13,
+  "rows": [
+    [
+      "Food/Biscuits/3"
+    ],
+    [
+      "Food/Biscuits/3",
+      "Food/Biscuits/37",
+      "Food/Biscuits/5"
+    ],
+    [
+      "Food/Biscuits/3",
+      "Food/Biscuits/37",
+      "Food/Biscuits/5"
+    ],
+    [
+      "Food/Biscuits/6",
+      "Food/Biscuits/10",
+      "Food/Biscuits/28"
+    ],
+    [
+      "Food/Biscuits/6",
+      "Food/Biscuits/10",
+      "Food/Biscuits/28"
+    ]
+  ]
+}

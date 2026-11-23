@@ -1,0 +1,25 @@
+{
+  "image": "s4_63",
+  "n_annotated_boxes": 13,
+  "rows": [
+    [
+      "Food/Snacks/22",
+      "Food/Snacks/22",
+      "Food/Snacks/22"
+    ],
+    [
+      "Food/Snacks/3",
+      "Food/Snacks/3",
+      "Food/Snacks/3",
+      "Food/Snacks/3",
+      "Food/Snacks/3"
+    ],
+    [
+      "Food/Snacks/29",
+      "Food/Snacks/29",
+      "Food/Snacks/29",
+      "Food/Snacks/29",
+      "Food/Snacks/29"
+    ]
+  ]
+}

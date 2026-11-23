@@ -1,0 +1,23 @@
+{
+  "image": "s1_46",
+  "n_annotated_boxes": 13,
+  "rows": [
+    [
+      "Food/Cereals/99",
+      "Food/Cereals/92",
+      "Food/Cereals/92",
+      "Food/Cereals/92",
+      "Food/Cereals/92",
+      "Food/Cereals/90"
+    ],
+    [
+      "Food/Cereals/117",
+      "Food/Cereals/117",
+      "Food/Cereals/94",
+      "Food/Cereals/94",
+      "Food/Cereals/94",
+      "Food/Cereals/87",
+      "Food/Cereals/87"
+    ]
+  ]
+}
