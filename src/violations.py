@@ -6,6 +6,9 @@ so every edited slot is a known violation:
   replace  a slot gets another product (half same subcategory, the hard case)
   insert   a new slot that has no product on the shelf       -> should come out "missing"
   remove   an interior slot is deleted, so its product on the shelf becomes an "extra"
+
+localisable=True keeps only edits that point to one slot: no remove, swap or insert next to an
+identical product (taking one of five identical cups out could be any of the five).
 """
 from __future__ import annotations
 
@@ -17,7 +20,7 @@ def subcategory(sku: str) -> str:
 
 
 def inject(rows: list[list[str]], pool: list[str], seed: int, rate_min=0.10, rate_max=0.20,
-           ops=("swap", "remove", "insert", "replace")):
+           ops=("swap", "remove", "insert", "replace"), localisable=False):
     """Returns (new_rows, truth). truth = {"changed": [[bool]] aligned with new_rows,
     "removed": [(row, gap_pos)], "log": [...]}; gap_pos = number of slots left of the removed one."""
     rng = random.Random(seed)
@@ -41,6 +44,13 @@ def inject(rows: list[list[str]], pool: list[str], seed: int, rate_min=0.10, rat
             cands = [s for s in pool if s != orig]
         return rng.choice(cands)
 
+    def alone(r, k, skus, partner=None):
+        """No live neighbour of slot k (other than the swap partner) carries one of `skus`."""
+        lv = live(r)
+        i = lv.index(k)
+        nb = [lv[j] for j in (i - 1, i + 1) if 0 <= j < len(lv) and lv[j] != partner]
+        return not localisable or all(R[r][j]["sku"] not in skus for j in nb)
+
     attempts = 0
     while len(log) < n_edits and attempts < 50 * n_edits:
         attempts += 1
@@ -48,7 +58,9 @@ def inject(rows: list[list[str]], pool: list[str], seed: int, rate_min=0.10, rat
         r = rng.randrange(len(R))
         f = fresh(r)
         if op == "swap":
-            pairs = [(a, b) for a in f for b in f if a < b and R[r][a]["sku"] != R[r][b]["sku"]]
+            pairs = [(a, b) for a in f for b in f if a < b and R[r][a]["sku"] != R[r][b]["sku"]
+                     and alone(r, a, {R[r][a]["sku"], R[r][b]["sku"]}, b)
+                     and alone(r, b, {R[r][a]["sku"], R[r][b]["sku"]}, a)]
             if not pairs:
                 continue
             a, b = rng.choice(pairs)
@@ -66,12 +78,16 @@ def inject(rows: list[list[str]], pool: list[str], seed: int, rate_min=0.10, rat
         elif op == "insert":
             pos = rng.randint(0, len(R[r]))
             new = other_product(rng.choice(rows[r]), rng.random() < 0.5)
+            nb = {R[r][j]["sku"] for j in (pos - 1, pos) if 0 <= j < len(R[r]) and not R[r][j].get("removed")}
+            if localisable and new in nb:
+                continue
             R[r].insert(pos, {"sku": new, "changed": True})
             log.append(dict(op="insert", row=r, sku=new))
         elif op == "remove":
             lv = live(r)
             interior = [k for k in f if lv and lv[0] < k < lv[-1]
-                        and not R[r][k - 1].get("removed") and not R[r][k + 1].get("removed")]
+                        and not R[r][k - 1].get("removed") and not R[r][k + 1].get("removed")
+                        and alone(r, k, {R[r][k]["sku"]})]
             if not interior:
                 continue
             k = rng.choice(interior)

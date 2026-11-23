@@ -147,3 +147,25 @@ def test_augment_views_deterministic():
     img = Image.fromarray((np.random.default_rng(0).random((120, 80, 3)) * 255).astype(np.uint8))
     a, b = augment_views(img, 8, "Food/Tea/1"), augment_views(img, 8, "Food/Tea/1")
     assert len(a) == 8 and all(np.array_equal(np.asarray(x), np.asarray(y)) for x, y in zip(a, b))
+
+
+def test_localisable_injection_avoids_identical_runs():
+    """With identical neighbours, localisable edits never remove/swap/insert inside a run."""
+    plan = [["A", "A", "A", "B", "C", "C", "D", "E", "E", "E"]] * 2
+    labels = [s for r in plan for s in r]
+    det_rows = [list(range(10)), list(range(10, 20))]
+    ver, unk = oracle(labels)
+    tot = dict(viol_detected=0, viol_total=0, false_alarms=0, unchanged_total=0)
+    for seed in range(60):
+        rows, truth = inject(plan, POOL + ["A", "B", "C", "D", "E"], seed, localisable=True)
+        slots, extras = align_shelf(rows, det_rows, ver, unk, end_cost=0.3)
+        for k, v in score(slots, extras, truth).items():
+            tot[k] += v
+    assert tot["viol_detected"] / tot["viol_total"] >= 0.90
+    assert tot["false_alarms"] / tot["unchanged_total"] <= 0.02
+    unrestricted = dict(viol_detected=0, viol_total=0)
+    for seed in range(60):                                    # same shelf, unrestricted edits: clearly worse
+        rows, truth = inject(plan, POOL + ["A", "B", "C", "D", "E"], seed)
+        sc = score(*align_shelf(rows, det_rows, ver, unk, end_cost=0.3), truth)
+        unrestricted["viol_detected"] += sc["viol_detected"]; unrestricted["viol_total"] += sc["viol_total"]
+    assert unrestricted["viol_detected"] / unrestricted["viol_total"] < tot["viol_detected"] / tot["viol_total"]

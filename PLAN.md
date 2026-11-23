@@ -1,6 +1,6 @@
 # Project 5 Plan: Retail Shelf Planogram Compliance with Open-Set SKU Recognition
 
-Status: draft for team review (2026-11-23). Nothing below is implemented yet.
+Status: superseded (2026-11-24). Section 1 describes the code before the rewrite; see README.md and outputs/metrics.json for the current state.
 Requirement codes (F1-F7, A1-A6, C1-C14) refer to the CSE437 project brief.
 
 ## 1. Where the current code stands

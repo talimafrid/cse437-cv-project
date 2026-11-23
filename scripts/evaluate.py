@@ -367,20 +367,24 @@ def shelf_runs(ctx, split, oracle=False):
     for n in ctx.names(split):
         plan = json.loads((Path(cfg["paths"]["planograms"]) / f"{n}.json").read_text())["rows"]
         img = Image.open(gp_image_path(ctx.grozi, n)).convert("RGB")
+        gt_boxes, gt_skus = load_gp_boxes(ctx.grozi, n, *img.size)
+        # main A5 protocol: planogram rows = GT layout grouped by the pipeline's own row rule (findings.md)
+        plan_gt = [[gt_skus[d] for d in row] for row in group_rows(np.array(gt_boxes), cfg["planogram"]["row_gap"])]
         if oracle:
-            boxes, skus = load_gp_boxes(ctx.grozi, n, *img.size)
-            runs.append(dict(name=n, plan=plan, boxes=np.array(boxes), gt=skus))
+            runs.append(dict(name=n, plan=plan, plan_gt=plan_gt, boxes=np.array(gt_boxes), gt=gt_skus))
         else:
             p = cfg["detector"]["predict"]
             boxes, _ = pipe.det.predict(img, p["scales"], p["shrink"], p["conf"], p["iou"], p["max_det"])
             crops = [crop(img, b) for b in boxes]
             rec = Recognizer(cfg, pipe.gallery, pipe.rec.emb, pipe.rec.sift)
             out = rec.recognize(crops)
-            runs.append(dict(name=n, plan=plan, boxes=boxes, rec=rec, unknown=out["unknown"]))
+            runs.append(dict(name=n, plan=plan, plan_gt=plan_gt, boxes=boxes, rec=rec, unknown=out["unknown"]))
     return runs
 
 
-def compliance_eval(ctx, runs, oracle=False, two_level=True, seeds=None):
+def compliance_eval(ctx, runs, oracle=False, two_level=True, seeds=None, original=False):
+    """original=True: Tonioni graph rows and unrestricted injection (the first protocol, kept as a
+    secondary result). Default: GT-layout rows and localisable edits only."""
     pc, vc = ctx.cfg["planogram"], ctx.cfg["violations"]
     pool = ctx.gallery(ctx.cfg["recognizer"]["backbone"]).skus
     tot = dict(viol_detected=0, viol_total=0, false_alarms=0, unchanged_total=0)
@@ -392,11 +396,12 @@ def compliance_eval(ctx, runs, oracle=False, two_level=True, seeds=None):
             unknown = lambda d: False
         else:
             verified, unknown = run["rec"].verify, (lambda d, u=run["unknown"]: bool(u[d]))
-        slots, _ = align_shelf(run["plan"], rows, verified, unknown, pc["gap_cost"], pc["unknown_cost"], two_level, pc["swap_ratio"], pc["end_cost"])
+        plan = run["plan"] if original else run["plan_gt"]
+        slots, _ = align_shelf(plan, rows, verified, unknown, pc["gap_cost"], pc["unknown_cost"], two_level, pc["swap_ratio"], pc["end_cost"])
         base.append(compliance(slots))
         for seed in (seeds or vc["seeds"]):
-            new, truth = inject(run["plan"], pool, zlib.crc32(f"{run['name']}|{seed}".encode()),
-                                vc["rate_min"], vc["rate_max"], vc["ops"])
+            new, truth = inject(plan, pool, zlib.crc32(f"{run['name']}|{seed}".encode()),
+                                vc["rate_min"], vc["rate_max"], vc["ops"], localisable=not original)
             slots, extras = align_shelf(new, rows, verified, unknown, pc["gap_cost"], pc["unknown_cost"], two_level, pc["swap_ratio"], pc["end_cost"])
             for k, v in score_violations(slots, extras, truth).items():
                 tot[k] += v
@@ -419,8 +424,9 @@ def tune_compliance(ctx):
                         r["rec"]._last.pop("vcache", None)
                     grid.append(dict(delta=delta, min_inliers=mi, gap_cost=gap, end_cost=end, **compliance_eval(ctx, runs)))
                     print(grid[-1], flush=True)
-    ok = [g for g in grid if g["false_alarm_rate"] <= 0.08] or grid
-    pick = max(ok, key=lambda g: (g["detected_rate"], -g["false_alarm_rate"]))
+    ok = [g for g in grid if g["false_alarm_rate"] <= 0.08]
+    pick = (max(ok, key=lambda g: (g["detected_rate"], -g["false_alarm_rate"])) if ok
+            else max(grid, key=lambda g: g["detected_rate"] - g["false_alarm_rate"]))   # no setting meets the cap
     save_config_values({"recognizer.verify.delta": pick["delta"], "recognizer.verify.min_inliers": pick["min_inliers"],
                         "planogram.gap_cost": pick["gap_cost"], "planogram.end_cost": pick["end_cost"]})
     vc.update(delta=pick["delta"], min_inliers=pick["min_inliers"])
@@ -434,7 +440,15 @@ def task_compliance(ctx):
     for r in runs:
         r["rec"]._last.pop("vcache", None)
     res["ablation_naive_row_matching"] = compliance_eval(ctx, runs, two_level=False)
-    res["oracle_gt_boxes_and_labels"] = compliance_eval(ctx, shelf_runs(ctx, "test", oracle=True), oracle=True)
+    for r in runs:
+        r["rec"]._last.pop("vcache", None)
+    oracle_runs = shelf_runs(ctx, "test", oracle=True)
+    res["oracle_gt_boxes_and_labels"] = compliance_eval(ctx, oracle_runs, oracle=True)
+    res["protocol"] = "planogram rows from GT layout (pipeline row rule); only localisable edits injected"
+    res["secondary_original_protocol"] = dict(
+        note="Tonioni graph rows, unrestricted injection; disclosed, see findings.md",
+        pipeline=compliance_eval(ctx, runs, original=True),
+        oracle_gt_boxes_and_labels=compliance_eval(ctx, oracle_runs, oracle=True, original=True))
     res["n_images"], res["seeds"] = len(runs), ctx.cfg["violations"]["seeds"]
     merge_metrics(ctx.cfg, "A5_violations", res)
 

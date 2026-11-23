@@ -1,83 +1,116 @@
-# Project 5: Retail shelf planogram compliance with open-set SKU recognition.
-# Every path, seed and threshold used by scripts/ and src/ comes from this file (C10).
-# Values marked "tuned" are written back by scripts/tune.py from validation data only (C4).
-
 seed: 42
-device: auto            # auto | cpu | cuda
-
+device: auto
 paths:
-  grozi: data/grozi                      # Grocery Products root (Training/, Testing/, bb/, planos/)
-  planogram_fixes: data/gp180            # gist fixes for s2_9 and s4_46
-  sku110k_raw: data/SKU110K_fixed        # extracted SKU110K_fixed.tar.gz
-  sku110k_yolo: data/sku110k_yolo        # YOLO-format copy (images resized, labels)
+  grozi: data/grozi
+  planogram_fixes: data/gp180
+  sku110k_raw: data/SKU110K_fixed
+  sku110k_yolo: data/sku110k_yolo
   splits: splits
   models: models
   outputs: outputs
-  index: outputs/index                   # gallery indexes, one sub-folder per backbone
-  planograms: outputs/planograms         # planograms converted to editable row JSON
-
+  index: outputs/index
+  planograms: outputs/planograms
 data:
-  gp_n_images: 70           # brief: GP-180 = 70 images
-  gp_n_val: 20              # brief: 20 val / 50 test
-  gp_val_forced: [s1_15, s2_3, s2_30, s2_143, s2_157, s3_111, s3_260, s5_55]   # cvpce validation images
-  gp_exclude: [s2_29, s1_10, s2_26, s1_29, s2_136, s3_191, s3_2, s4_63]         # unpaired / broken planograms
-  openset_fraction: 0.20    # brief: 20% of gallery products held out as unknown
-  sku110k_test_subset: 500  # A1 needs >= 500 test images
-  sku110k_resize: 1024      # long side of the resized YOLO copy (labels are normalised, so unchanged)
-
+  gp_n_images: 70
+  gp_n_val: 20
+  gp_val_forced:
+  - s1_15
+  - s2_3
+  - s2_30
+  - s2_143
+  - s2_157
+  - s3_111
+  - s3_260
+  - s5_55
+  gp_exclude:
+  - s2_29
+  - s1_10
+  - s2_26
+  - s1_29
+  - s2_136
+  - s3_191
+  - s3_2
+  - s4_63
+  openset_fraction: 0.2
+  sku110k_test_subset: 500
+  sku110k_resize: 1024
 detector:
   base_model: yolo11s.pt
   weights: models/sku110k_yolo11s.pt
   train:
     imgsz: 640
-    batch: 16
-    time_hours: 1.5         # brief: detector training <= 2 GPU-hours
+    batch: 8
+    time_hours: 1.5
     max_det: 1000
   predict:
-    conf: 0.05              # tuned
+    conf: 0.05
     iou: 0.5
     max_det: 1000
-    scales: [640, 1024]     # tuned: whole-image inference sizes, merged by NMS
-    shrink: [1.0]           # tuned: extra passes on the image shrunk into a padded canvas
-
+    scales:
+    - 640
+    shrink:
+    - 1.0
+    - 0.5
 recognizer:
-  backbone: dinov2_b        # tuned: best backbone on validation crops
-  backbones:                # name -> settings; see src/recognizer.py
-    resnet50: {kind: cnn, size: 320}
-    dinov2_b: {kind: dinov2, hf: facebook/dinov2-base, size: 336}
-    siglip2_b: {kind: siglip, hf: google/siglip2-base-patch16-384, size: 384}
-    clip_b16: {kind: clip, hf: openai/clip-vit-base-patch16, size: 224}
+  backbone: siglip2_b
+  backbones:
+    resnet50:
+      kind: cnn
+      size: 320
+    dinov2_b:
+      kind: dinov2
+      hf: facebook/dinov2-base
+      size: 336
+    siglip2_b:
+      kind: siglip
+      hf: google/siglip2-base-patch16-384
+      size: 384
+    clip_b16:
+      kind: clip
+      hf: openai/clip-vit-base-patch16
+      size: 224
   batch_size: 32
-  gallery_views: 8          # 1 original + 7 synthetic augmentations per product
+  gallery_views: 8
   top_k: 5
   sift:
-    max_features: 400       # per gallery image for the SIFT k-NN baseline
+    max_features: 400
     ratio: 0.8
     ransac_px: 5.0
-    crop_side: 320          # crops and references resized to this long side before SIFT
-    rerank_lambda: 0.3      # tuned
-    rerank_margin: 0.05     # tuned: SIFT re-ranking only when top1-top2 margin is below this
+    crop_side: 320
+    rerank_lambda: 0.1
+    rerank_margin: 0.02
   openset:
-    threshold: 0.5          # tuned: logistic-score threshold, below = unknown
-    coef: null              # tuned: logistic weights over [c1, margin, inliers, hull]
-  verify:                   # 1:1 "is this the expected product?" check used for compliance
-    delta: 0.05             # tuned: expected SKU accepted if its score >= top1 - delta
-    min_inliers: 12         # tuned: or if SIFT finds this many inliers against it
-
+    threshold: 0.5131
+    coef:
+    - 2.1230453530542768
+    - 1.8360151337462287
+    - 1.3021075866633225
+    - 1.2273885020075783
+    - -1.97705881520074
+  verify:
+    delta: 0.05
+    min_inliers: 20
 planogram:
-  row_gap: 0.5              # split rows where the y-centre gap > row_gap * median box height
-  gap_cost: 0.6             # tuned: NW gap cost inside a row
-  row_gap_cost: 0.7         # NW gap cost for a whole row
-  unknown_cost: 0.5         # substitution cost when the crop was rejected as unknown
-  swap_ratio: 0.75          # adjacent-swap cost = swap_ratio * 2 * gap_cost (Damerau step in the row DP)
-  end_cost: 0.2             # tuned: cost per detection skipped left/right of a planogram row
-
+  row_gap: 0.5
+  gap_cost: 0.6
+  row_gap_cost: 0.7
+  unknown_cost: 0.5
+  swap_ratio: 0.75
+  end_cost: 0.1
 violations:
-  rate_min: 0.10
-  rate_max: 0.20
-  seeds: [0, 1, 2, 3, 4]
-  ops: [swap, remove, insert, replace]
-
+  rate_min: 0.1
+  rate_max: 0.2
+  seeds:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  ops:
+  - swap
+  - remove
+  - insert
+  - replace
 latency:
   runs: 100
   warmup: 5

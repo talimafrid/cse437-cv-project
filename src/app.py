@@ -9,11 +9,13 @@ import time
 from pathlib import Path
 
 import gradio as gr
+import numpy as np
 import pandas as pd
 
-from src.data import gp_image_path, read_list
+from src.data import gp_image_path, load_gp_boxes, read_list
 from src.gallery import embed_product, index_dir
 from src.pipeline import Pipeline, write_report
+from src.planogram import group_rows
 from src.recognizer import Sift
 from src.utils import load_config
 from src.violations import inject
@@ -37,8 +39,11 @@ def test_images() -> list[str]:
 
 
 def pick_image(name: str):
-    rows = json.loads((PLANOS / f"{name}.json").read_text())["rows"]
-    return str(gp_image_path(Path(CFG["paths"]["grozi"]), name)), json.dumps(rows, indent=1)
+    """Planogram = GT layout grouped by the pipeline's row rule (same as the main A5 protocol)."""
+    path = gp_image_path(Path(CFG["paths"]["grozi"]), name)
+    boxes, skus = load_gp_boxes(Path(CFG["paths"]["grozi"]), name)
+    rows = [[skus[d] for d in row] for row in group_rows(np.array(boxes), CFG["planogram"]["row_gap"])]
+    return str(path), json.dumps(rows, indent=1)
 
 
 def run_audit(image, plan_text: str, name: str):
