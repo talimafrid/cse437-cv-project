@@ -1,248 +1,212 @@
+"""F2/F3: SKU recognition by retrieval, with open-set rejection. No per-SKU classifier is trained.
+
+Embedders (frozen, pretrained): ResNet-50 (GeM pooling), DINOv2, SigLIP2, CLIP.
+Classical: RootSIFT + Lowe ratio test + RANSAC homography (baseline and geometric re-ranker).
+Crops are padded to square (not squashed) before resizing.
 """
-F2/F3 - SKU Recognition & Open-Set Rejection Module
-=====================================================
+from __future__ import annotations
 
-This module provides:
-1. FeatureExtractor: Extracts L2-normalized deep visual embeddings from product crops
-   using a pre-trained CNN (ResNet-50 by default).
-2. SKUMatcher: Queries a gallery feature index using cosine similarity and handles
-   open-set rejection via similarity thresholds.
+import hashlib
+import io
 
-Conforms to enterprise SQA standards with explicit type hinting, boundary checks,
-and informative docstrings.
-"""
-
-from typing import List, Tuple, Union, Optional, Dict, Any
+import cv2
 import numpy as np
-import torch
-import torch.nn as nn
-from torchvision import models, transforms
-from PIL import Image
+from PIL import Image, ImageFilter
+
+PAD_COLOR = (124, 116, 104)
 
 
-class FeatureExtractor:
-    """Extracts compact feature embeddings from product image crops.
+def pad_square(img: Image.Image, size: int) -> Image.Image:
+    w, h = img.size
+    s = size / max(w, h)
+    img = img.resize((max(1, round(w * s)), max(1, round(h * s))), Image.BICUBIC)
+    canvas = Image.new("RGB", (size, size), PAD_COLOR)
+    canvas.paste(img, ((size - img.size[0]) // 2, (size - img.size[1]) // 2))
+    return canvas
 
-    Uses a pre-trained ResNet-50 backbone stripped of its classification head,
-    producing L2-normalized embeddings suitable for cosine distance retrieval.
 
-    Attributes:
-        device (torch.device): Compute device ('cpu' or 'cuda').
-        model (nn.Module): Truncated backbone network.
-        transform (transforms.Compose): Image preprocessing pipeline.
-        embedding_dim (int): Dimensionality of the output feature vector (2048 for ResNet50).
-    """
+class Embedder:
+    """Frozen backbone -> L2-normalised global descriptor."""
 
-    def __init__(
-        self,
-        backbone: str = "resnet50",
-        device: Optional[str] = None,
-        weights: str = "DEFAULT",
-    ) -> None:
-        """Initializes the feature extractor backbone and preprocessing transforms.
-
-        Args:
-            backbone: Architecture name ('resnet50').
-            device: Target execution device ('cpu', 'cuda', etc.). If None, auto-detects.
-            weights: Pretrained weights specification (defaults to PyTorch standard DEFAULT).
-
-        Raises:
-            ValueError: If an unsupported backbone architecture is specified.
-        """
-        if device is None:
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    def __init__(self, name: str, spec: dict, device: str = "cpu"):
+        import torch
+        self.torch, self.name, self.kind, self.size, self.device = torch, name, spec["kind"], spec["size"], device
+        if self.kind == "cnn":
+            from torchvision.models import ResNet50_Weights, resnet50
+            m = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
+            self.model = torch.nn.Sequential(*list(m.children())[:-2])      # keep the feature map
+            self.mean, self.std = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
         else:
-            self.device = torch.device(device)
+            from transformers import AutoImageProcessor, AutoModel
+            proc = AutoImageProcessor.from_pretrained(spec["hf"])
+            self.mean, self.std = list(proc.image_mean), list(proc.image_std)
+            self.model = AutoModel.from_pretrained(spec["hf"])
+        self.model.eval().to(device)
+        if device.startswith("cuda"):
+            self.model.half()
 
-        if backbone == "resnet50":
-            # Load ResNet50 with standard torchvision weights
-            base_model = models.resnet50(weights=weights)
-            # Remove the final classification layer (fc) while retaining the avgpool
-            self.model = nn.Sequential(*list(base_model.children())[:-1])
-            self.embedding_dim: int = 2048
-        else:
-            raise ValueError(f"Unsupported backbone: '{backbone}'. Supported: ['resnet50']")
+    def _tensor(self, imgs):
+        t = self.torch
+        x = np.stack([np.asarray(pad_square(i.convert("RGB"), self.size), dtype=np.float32) / 255.0 for i in imgs])
+        x = (x - np.array(self.mean, np.float32)) / np.array(self.std, np.float32)
+        x = t.from_numpy(x).permute(0, 3, 1, 2).to(self.device)
+        return x.half() if self.device.startswith("cuda") else x
 
-        self.model.to(self.device)
-        self.model.eval()
-
-        # Standard ImageNet normalization and preprocessing
-        self.transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225]
-            )
-        ])
-
-    @torch.no_grad()
-    def extract_single(self, image: Union[Image.Image, np.ndarray]) -> np.ndarray:
-        """Extracts an L2-normalized embedding for a single image crop.
-
-        Args:
-            image: PIL Image or NumPy array (RGB/BGR/Grayscale).
-
-        Returns:
-            1D float32 NumPy array of shape (embedding_dim,) normalized to unit length.
-
-        Raises:
-            TypeError: If input image is not PIL.Image or np.ndarray.
-            ValueError: If input image is empty or invalid.
-        """
-        batch_embedding = self.extract_batch([image])
-        return batch_embedding[0]
-
-    @torch.no_grad()
-    def extract_batch(
-        self,
-        images: List[Union[Image.Image, np.ndarray]],
-        batch_size: int = 64
-    ) -> np.ndarray:
-        """Extracts L2-normalized embeddings for a list of image crops in mini-batches.
-
-        Args:
-            images: List of images as PIL Images or NumPy arrays.
-            batch_size: Mini-batch size for GPU/CPU evaluation.
-
-        Returns:
-            2D float32 NumPy array of shape (N, embedding_dim), each row normalized to unit length.
-
-        Raises:
-            ValueError: If the images list is empty.
-        """
-        if not images:
-            raise ValueError("Input images list cannot be empty.")
-
-        tensors = []
-        for idx, img in enumerate(images):
-            if isinstance(img, np.ndarray):
-                assert img.size > 0, f"Image at index {idx} is empty array."
-                # Convert OpenCV BGR to RGB if needed
-                if len(img.shape) == 3 and img.shape[2] == 3:
-                    pil_img = Image.fromarray(img[..., ::-1])
-                elif len(img.shape) == 2:
-                    pil_img = Image.fromarray(img).convert("RGB")
-                else:
-                    pil_img = Image.fromarray(img).convert("RGB")
-            elif isinstance(img, Image.Image):
-                pil_img = img.convert("RGB")
-            else:
-                raise TypeError(f"Element at index {idx} has unsupported type {type(img)}.")
-
-            tensors.append(self.transform(pil_img))
-
-        all_embeddings: List[np.ndarray] = []
-        num_samples = len(tensors)
-
-        for i in range(0, num_samples, batch_size):
-            batch_tensors = torch.stack(tensors[i:i + batch_size]).to(self.device)
-            # Forward pass: shape (B, 2048, 1, 1) -> flatten to (B, 2048)
-            feats = self.model(batch_tensors).flatten(start_dim=1)
-            # L2 normalization across feature dimension
-            feats = nn.functional.normalize(feats, p=2, dim=1)
-            all_embeddings.append(feats.cpu().numpy().astype(np.float32))
-
-        result = np.vstack(all_embeddings)
-        assert result.shape == (num_samples, self.embedding_dim), (
-            f"Expected shape ({num_samples}, {self.embedding_dim}), got {result.shape}"
-        )
-        return result
+    def embed(self, imgs: list[Image.Image], batch_size: int = 32) -> np.ndarray:
+        t = self.torch
+        out = []
+        with t.no_grad():
+            for i in range(0, len(imgs), batch_size):
+                x = self._tensor(imgs[i:i + batch_size])
+                if self.kind == "cnn":
+                    f = self.model(x).float().clamp(min=1e-6)
+                    f = f.pow(3).mean(dim=(2, 3)).pow(1 / 3)                    # GeM, p=3
+                elif self.kind == "dinov2":
+                    h = self.model(pixel_values=x).last_hidden_state.float()
+                    cls = t.nn.functional.normalize(h[:, 0], dim=1)
+                    patch = t.nn.functional.normalize(h[:, 1:].mean(1), dim=1)
+                    f = t.cat([cls, patch], dim=1)
+                else:                                                              # siglip / clip
+                    f = self.model.get_image_features(pixel_values=x)
+                    f = (f if isinstance(f, t.Tensor) else f.pooler_output).float()
+                out.append(t.nn.functional.normalize(f, dim=1).cpu().numpy())
+        return np.concatenate(out).astype(np.float32)
 
 
-class SKUMatcher:
-    """Matches query crop embeddings against a gallery with open-set rejection.
+# ---------------------------------------------------------------- gallery augmentation
 
-    Implements dual-threshold open-set identification:
-    - similarity >= match_threshold: CONFIRMED match to top SKU.
-    - reject_threshold <= similarity < match_threshold: LOW_CONFIDENCE match.
-    - similarity < reject_threshold: REJECTED as UNKNOWN (open-set facing).
+def _rng_for(key: str, seed: int) -> np.random.Generator:
+    return np.random.default_rng(int(hashlib.md5(f"{key}|{seed}".encode()).hexdigest()[:8], 16))
 
-    Attributes:
-        match_threshold (float): Threshold above which a match is confident.
-        reject_threshold (float): Threshold below which a crop is declared unknown.
-    """
 
-    def __init__(
-        self,
-        match_threshold: float = 0.65,
-        reject_threshold: float = 0.40
-    ) -> None:
-        """Initializes the matcher with classification and rejection thresholds.
+def _perspective(img, rng, strength=0.12):
+    w, h = img.size
+    src = np.float32([[0, 0], [w, 0], [w, h], [0, h]])
+    dst = (src + rng.uniform(-strength, strength, (4, 2)) * [w, h]).astype(np.float32)   # cv2 needs float32
+    m = cv2.getPerspectiveTransform(src, dst)
+    a = cv2.warpPerspective(np.asarray(img), m, (w, h), borderValue=PAD_COLOR)
+    return Image.fromarray(a)
 
-        Args:
-            match_threshold: Minimum cosine similarity for a solid match [0, 1].
-            reject_threshold: Lower bound cosine similarity; below this is 'UNKNOWN'.
 
-        Raises:
-            ValueError: If thresholds are invalid or reject_threshold >= match_threshold.
-        """
-        if not (0.0 <= reject_threshold < match_threshold <= 1.0):
-            raise ValueError(
-                f"Threshold constraints violated. Must satisfy: "
-                f"0.0 <= reject ({reject_threshold}) < match ({match_threshold}) <= 1.0"
-            )
-        self.match_threshold = match_threshold
-        self.reject_threshold = reject_threshold
+def _jitter(img, rng):
+    a = np.asarray(img, np.float32)
+    a = a * rng.uniform(0.6, 1.3) + rng.uniform(-25, 25)                 # brightness / offset
+    mean = a.mean()
+    a = (a - mean) * rng.uniform(0.7, 1.2) + mean                         # contrast
+    gray = a.mean(axis=2, keepdims=True)
+    a = gray + (a - gray) * rng.uniform(0.6, 1.3)                         # saturation
+    a = a * rng.uniform(0.9, 1.1, 3)                                       # colour cast
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
 
-    def match(
-        self,
-        query_embedding: np.ndarray,
-        gallery_index: Any,
-        top_k: int = 1
-    ) -> Dict[str, Any]:
-        """Matches a single query embedding against the gallery index.
 
-        Args:
-            query_embedding: 1D array of shape (embedding_dim,) or 2D array (1, embedding_dim).
-            gallery_index: Instance of GalleryIndex providing query(embedding, top_k).
-            top_k: Number of nearest gallery neighbors to retrieve.
+def _glare(img, rng):
+    a = np.asarray(img, np.float32)
+    h, w = a.shape[:2]
+    cy, cx = rng.uniform(0, h), rng.uniform(0, w)
+    sy, sx = rng.uniform(0.1, 0.35) * h, rng.uniform(0.1, 0.35) * w
+    yy, xx = np.mgrid[0:h, 0:w]
+    g = np.exp(-(((yy - cy) / sy) ** 2 + ((xx - cx) / sx) ** 2))[..., None]
+    return Image.fromarray(np.clip(a + g * rng.uniform(80, 200), 0, 255).astype(np.uint8))
 
-        Returns:
-            Dictionary containing:
-                - 'sku_id' (str): Best SKU identifier or 'UNKNOWN'.
-                - 'confidence' (float): Cosine similarity score [0.0, 1.0].
-                - 'status' (str): 'CONFIRMED', 'LOW_CONFIDENCE', or 'UNKNOWN'.
-                - 'top_candidates' (List[Dict]): Detailed top_k retrieved records.
 
-        Raises:
-            ValueError: If query embedding dimensions are malformed.
-        """
-        assert query_embedding is not None, "Query embedding cannot be None."
-        if query_embedding.ndim == 1:
-            q = query_embedding.reshape(1, -1)
-        elif query_embedding.ndim == 2 and query_embedding.shape[0] == 1:
-            q = query_embedding
-        else:
-            raise ValueError(f"Expected shape (D,) or (1, D), got {query_embedding.shape}")
+def _blur_lowres(img, rng):
+    w, h = img.size
+    s = rng.uniform(0.15, 0.4)
+    img = img.resize((max(8, int(w * s)), max(8, int(h * s))), Image.BILINEAR).resize((w, h), Image.BILINEAR)
+    return img.filter(ImageFilter.GaussianBlur(rng.uniform(0.5, 2.0)))
 
-        candidates = gallery_index.search(q, top_k=top_k)[0]
-        if not candidates:
-            return {
-                "sku_id": "UNKNOWN",
-                "confidence": 0.0,
-                "status": "UNKNOWN",
-                "top_candidates": []
-            }
 
-        top_match = candidates[0]
-        best_sku = top_match["sku_id"]
-        similarity = float(top_match["score"])
+def _crop(img, rng):
+    w, h = img.size
+    f = rng.uniform(0.75, 0.95)
+    cw, ch = int(w * f), int(h * f)
+    x, y = int(rng.uniform(0, w - cw)), int(rng.uniform(0, h - ch))
+    return img.crop((x, y, x + cw, y + ch))
 
-        # Open-set classification logic
-        if similarity >= self.match_threshold:
-            status = "CONFIRMED"
-            sku_id = best_sku
-        elif similarity >= self.reject_threshold:
-            status = "LOW_CONFIDENCE"
-            sku_id = best_sku
-        else:
-            status = "UNKNOWN"
-            sku_id = "UNKNOWN"
 
-        return {
-            "sku_id": sku_id,
-            "confidence": similarity,
-            "status": status,
-            "top_candidates": candidates
-        }
+def _jpeg_noise_rot(img, rng):
+    img = img.rotate(rng.uniform(-6, 6), resample=Image.BICUBIC, expand=True, fillcolor=PAD_COLOR)
+    a = np.asarray(img, np.float32) + rng.normal(0, 6, (img.size[1], img.size[0], 3))
+    buf = io.BytesIO()
+    Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).save(buf, "JPEG", quality=int(rng.uniform(20, 50)))
+    return Image.open(io.BytesIO(buf.getvalue())).convert("RGB")
+
+
+def augment_views(img: Image.Image, n: int, key: str, seed: int = 0) -> list[Image.Image]:
+    """View 0 is the studio image itself; the rest are seeded synthetic shelf-like versions."""
+    img = img.convert("RGB")
+    if max(img.size) > 640:                                                # speed: studio images are large
+        s = 640 / max(img.size)
+        img = img.resize((round(img.size[0] * s), round(img.size[1] * s)), Image.BICUBIC)
+    rng = _rng_for(key, seed)
+    ops = [
+        lambda i: _blur_lowres(i, rng),
+        lambda i: _jitter(i, rng),
+        lambda i: _perspective(i, rng),
+        lambda i: _glare(i, rng),
+        lambda i: _crop(i, rng),
+        lambda i: _blur_lowres(_jitter(_perspective(i, rng), rng), rng),
+        lambda i: _jpeg_noise_rot(_glare(i, rng), rng),
+    ]
+    views = [img]
+    for k in range(n - 1):
+        views.append(ops[k % len(ops)](img))
+    return views
+
+
+# ---------------------------------------------------------------- SIFT
+
+class Sift:
+    """RootSIFT features, ratio-test matching and RANSAC homography verification."""
+
+    def __init__(self, spec: dict):
+        self.spec = spec
+        self.det = cv2.SIFT_create(nfeatures=spec["max_features"])
+
+    def features(self, img: Image.Image):
+        side = self.spec["crop_side"]
+        g = np.asarray(img.convert("L"))
+        s = side / max(g.shape)
+        g = cv2.resize(g, (max(8, round(g.shape[1] * s)), max(8, round(g.shape[0] * s))), interpolation=cv2.INTER_AREA)
+        kp, des = self.det.detectAndCompute(g, None)
+        if des is None or len(kp) < 2:
+            return np.zeros((0, 2), np.float32), np.zeros((0, 128), np.float32), g.shape
+        des = des / (des.sum(axis=1, keepdims=True) + 1e-7)
+        des = np.sqrt(des).astype(np.float32)                              # RootSIFT
+        return np.float32([k.pt for k in kp]), des, g.shape
+
+    def match(self, q, r) -> tuple[int, float]:
+        """Returns (RANSAC inliers, inlier convex-hull area / query area)."""
+        (qp, qd, qshape), (rp, rd, _) = q, r
+        if len(qd) < 4 or len(rd) < 4:
+            return 0, 0.0
+        sims = qd @ rd.T
+        idx = np.argsort(-sims, axis=1)[:, :2]
+        d1 = np.sqrt(np.clip(2 - 2 * sims[np.arange(len(qd)), idx[:, 0]], 0, None))
+        d2 = np.sqrt(np.clip(2 - 2 * sims[np.arange(len(qd)), idx[:, 1]], 0, None))
+        good = d1 < self.spec["ratio"] * d2
+        if good.sum() < 4:
+            return 0, 0.0
+        src, dst = qp[good], rp[idx[good, 0]]
+        _, mask = cv2.findHomography(src, dst, cv2.RANSAC, self.spec["ransac_px"])
+        if mask is None:
+            return 0, 0.0
+        inl = src[mask.ravel().astype(bool)]
+        if len(inl) < 3:
+            return int(len(inl)), 0.0
+        hull = cv2.contourArea(cv2.convexHull(inl.astype(np.float32)))
+        return int(len(inl)), float(hull / (qshape[0] * qshape[1]))
+
+
+# ---------------------------------------------------------------- open-set scoring
+
+def openset_features(top_scores: np.ndarray, inliers: np.ndarray, hull: np.ndarray) -> np.ndarray:
+    """[c1, c1 - c2, min(inliers, 50) / 50, hull fraction] per crop."""
+    c1, c2 = top_scores[:, 0], top_scores[:, 1]
+    return np.stack([c1, c1 - c2, np.minimum(inliers, 50) / 50.0, hull], axis=1)
+
+
+def known_probability(feats: np.ndarray, coef: list[float]) -> np.ndarray:
+    """Logistic model fitted on validation crops: coef = [w1..w4, bias]."""
+    w, b = np.asarray(coef[:-1]), coef[-1]
+    return 1.0 / (1.0 + np.exp(-(feats @ w + b)))

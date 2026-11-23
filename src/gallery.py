@@ -1,275 +1,160 @@
+"""F6: gallery index of one studio image per product (+ synthetic views), with add / remove.
+
+Index layout on disk (outputs/index/<backbone>/):
+  emb.npy     float16 (P, V, D)  L2-normalised embeddings, V views per product
+  skus.json   list of P product ids, e.g. "Food/Rice/17"
+  sift.npz    RootSIFT keypoints/descriptors of each studio image (for verification)
+
+Usage:
+  python -m src.gallery build [--backbone dinov2_b]
+  python -m src.gallery add --image path/to/new.jpg --sku Food/Tea/999
+  python -m src.gallery remove --sku Food/Tea/999
 """
-F6 & Gallery Indexing Module
-============================
+from __future__ import annotations
 
-Manages reference SKU embeddings using Faiss IndexFlatIP (Inner Product)
-for fast cosine similarity search over unit-normalized feature vectors.
-
-Supports:
-- Building gallery from GroZi training reference images.
-- Dynamic addition of new SKUs without retraining (F6 Add-a-SKU).
-- Persistence (saving & loading faiss index + metadata).
-"""
-
-from typing import List, Dict, Any, Optional, Union, Tuple
-import os
+import argparse
 import json
+import time
 from pathlib import Path
+
 import numpy as np
-import faiss
 from PIL import Image
 
-from src.recognizer import FeatureExtractor
+from src.data import gallery_products
+from src.recognizer import Embedder, Sift, augment_views
+from src.utils import get_device, load_config
 
 
-class GalleryIndex:
-    """Manages the vector database for SKU gallery reference images using Faiss.
+class Gallery:
+    def __init__(self, skus: list[str], emb: np.ndarray, sift: dict | None = None):
+        assert emb.ndim == 3 and len(skus) == emb.shape[0]
+        self.skus, self.emb, self.sift = list(skus), emb, sift or {}
+        self._pos = {s: i for i, s in enumerate(self.skus)}
 
-    Since all feature vectors are L2-normalized upon extraction, the Inner Product (IP)
-    metric directly computes cosine similarity:
-        similarity = dot(u, v) in [-1.0, 1.0]
+    def __len__(self):
+        return len(self.skus)
 
-    Attributes:
-        embedding_dim (int): Vector dimension (e.g. 2048 for ResNet50).
-        index (faiss.IndexFlatIP): Underlying Faiss index.
-        metadata (List[Dict[str, Any]]): Parallel metadata mapping index IDs to SKU info.
-    """
+    @property
+    def nbytes(self) -> int:
+        return int(self.emb.nbytes)
 
-    def __init__(self, embedding_dim: int = 2048) -> None:
-        """Initializes an empty Faiss Inner Product index.
+    def scores(self, q: np.ndarray) -> np.ndarray:
+        """(N, D) query embeddings -> (N, P) product scores = max cosine over the product's views."""
+        p, v, d = self.emb.shape
+        s = q.astype(np.float32) @ self.emb.reshape(p * v, d).astype(np.float32).T
+        return s.reshape(len(q), p, v).max(axis=2)
 
-        Args:
-            embedding_dim: Dimensionality of feature embeddings.
-        """
-        assert embedding_dim > 0, "Embedding dimension must be strictly positive."
-        self.embedding_dim = embedding_dim
-        self.index: faiss.IndexFlatIP = faiss.IndexFlatIP(self.embedding_dim)
-        self.metadata: List[Dict[str, Any]] = []
+    def subset(self, exclude: set[str]) -> "Gallery":
+        keep = [i for i, s in enumerate(self.skus) if s not in exclude]
+        return Gallery([self.skus[i] for i in keep], self.emb[keep],
+                       {s: self.sift[s] for s in (self.skus[i] for i in keep) if s in self.sift})
 
-    def __len__(self) -> int:
-        """Returns total number of items currently indexed in the gallery."""
-        return self.index.ntotal
+    def index_of(self, sku: str) -> int | None:
+        return self._pos.get(sku)
 
-    def add_sku(
-        self,
-        sku_id: str,
-        image_path_or_crop: Union[str, Path, Image.Image, np.ndarray],
-        extractor: FeatureExtractor,
-        category: Optional[str] = None,
-        custom_metadata: Optional[Dict[str, Any]] = None
-    ) -> int:
-        """Dynamically registers a single SKU into the gallery index (F6: Add-a-SKU).
+    def add(self, sku: str, emb_views: np.ndarray, sift_feat=None):
+        if sku in self._pos:                                     # re-adding replaces the old entry
+            self.remove(sku)
+        self.skus.append(sku)
+        self.emb = np.concatenate([self.emb, emb_views[None].astype(self.emb.dtype)])
+        self._pos[sku] = len(self.skus) - 1
+        if sift_feat is not None:
+            self.sift[sku] = sift_feat
 
-        Does not require re-indexing or retraining.
+    def remove(self, sku: str):
+        i = self._pos.pop(sku)
+        del self.skus[i]
+        self.emb = np.delete(self.emb, i, axis=0)
+        self.sift.pop(sku, None)
+        self._pos = {s: k for k, s in enumerate(self.skus)}
 
-        Args:
-            sku_id: Unique identifier for the product SKU (e.g., 'Food/Tea/1').
-            image_path_or_crop: Filepath or image object of the reference product.
-            extractor: FeatureExtractor instance to compute the embedding.
-            category: Optional taxonomy category (e.g., 'Food/Tea').
-            custom_metadata: Extra arbitrary fields to attach to this gallery item.
+    # -------------------------------------------------------- persistence
+    def save(self, folder: Path):
+        folder.mkdir(parents=True, exist_ok=True)
+        np.save(folder / "emb.npy", self.emb.astype(np.float16))
+        (folder / "skus.json").write_text(json.dumps(self.skus), encoding="utf-8")
+        if self.sift:
+            ks = sorted(self.sift)
+            np.savez(folder / "sift.npz", skus=np.array(ks),
+                     pts=np.array([self.sift[k][0] for k in ks], dtype=object),
+                     des=np.array([self.sift[k][1].astype(np.float16) for k in ks], dtype=object),
+                     shape=np.array([self.sift[k][2] for k in ks]))
 
-        Returns:
-            The integer index assigned to the newly registered SKU.
+    @classmethod
+    def load(cls, folder: Path, with_sift: bool = True) -> "Gallery":
+        skus = json.loads((folder / "skus.json").read_text(encoding="utf-8"))
+        emb = np.load(folder / "emb.npy")
+        sift = {}
+        if with_sift and (folder / "sift.npz").exists():
+            z = np.load(folder / "sift.npz", allow_pickle=True)
+            for k, p, d, sh in zip(z["skus"], z["pts"], z["des"], z["shape"]):
+                sift[str(k)] = (p.astype(np.float32), d.astype(np.float32), tuple(sh))
+        return cls(skus, emb, sift)
 
-        Raises:
-            FileNotFoundError: If a provided image path does not exist.
-            ValueError: If sku_id is empty or image cannot be processed.
-        """
-        if not sku_id or not str(sku_id).strip():
-            raise ValueError("sku_id must be a non-empty string.")
 
-        if isinstance(image_path_or_crop, (str, Path)):
-            path_obj = Path(image_path_or_crop)
-            if not path_obj.exists():
-                raise FileNotFoundError(f"Reference image not found: {path_obj}")
-            img = Image.open(path_obj).convert("RGB")
-            rel_path = str(path_obj)
-        elif isinstance(image_path_or_crop, (Image.Image, np.ndarray)):
-            img = image_path_or_crop
-            rel_path = "dynamic_in_memory"
-        else:
-            raise TypeError(f"Unsupported image type: {type(image_path_or_crop)}")
+def embed_product(img: Image.Image, sku: str, embedder: Embedder, cfg: dict, views: int | None = None) -> np.ndarray:
+    v = views or cfg["recognizer"]["gallery_views"]
+    return embedder.embed(augment_views(img, v, sku, cfg["seed"]), cfg["recognizer"]["batch_size"])
 
-        # Extract 2048-dim L2-normalized embedding
-        embedding = extractor.extract_single(img).reshape(1, -1).astype(np.float32)
-        assert embedding.shape == (1, self.embedding_dim), (
-            f"Embedding dimension mismatch: {embedding.shape} vs expected (1, {self.embedding_dim})"
-        )
 
-        assigned_id = self.index.ntotal
-        self.index.add(embedding)
+def build(cfg: dict, backbone: str, views: int | None = None, out: Path | None = None, with_sift: bool = True) -> Gallery:
+    products = gallery_products(Path(cfg["paths"]["grozi"]))
+    spec = cfg["recognizer"]["backbones"][backbone]
+    emb = Embedder(backbone, spec, get_device(cfg))
+    sift = Sift(cfg["recognizer"]["sift"]) if with_sift else None
+    skus, embs, feats = [], [], {}
+    t0 = time.time()
+    for k, (sku, path) in enumerate(products.items()):
+        img = Image.open(path).convert("RGB")
+        embs.append(embed_product(img, sku, emb, cfg, views).astype(np.float16))
+        skus.append(sku)
+        if sift:
+            feats[sku] = sift.features(img)
+        if (k + 1) % 250 == 0:
+            print(f"  {k + 1}/{len(products)} products, {time.time() - t0:.0f}s", flush=True)
+    g = Gallery(skus, np.stack(embs), feats)
+    if out:
+        g.save(out)
+    return g
 
-        meta = {
-            "index_id": assigned_id,
-            "sku_id": str(sku_id),
-            "image_path": rel_path,
-            "category": category if category else "Uncategorized"
-        }
-        if custom_metadata:
-            meta.update(custom_metadata)
 
-        self.metadata.append(meta)
-        assert len(self.metadata) == self.index.ntotal, "Metadata and Faiss index length out of sync!"
-        return assigned_id
+def index_dir(cfg: dict, backbone: str, views: int | None = None) -> Path:
+    v = views or cfg["recognizer"]["gallery_views"]
+    return Path(cfg["paths"]["index"]) / f"{backbone}_v{v}"
 
-    def build_from_directory(
-        self,
-        gallery_dir: Union[str, Path],
-        extractor: FeatureExtractor,
-        batch_size: int = 64,
-        valid_extensions: Tuple[str, ...] = (".jpg", ".jpeg", ".png")
-    ) -> int:
-        """Populates the gallery index by scanning a directory tree of reference images.
 
-        Organizes SKU IDs based on relative directory paths.
-        For example, 'Food/Tea/1.jpg' -> sku_id = 'Food/Tea/1'.
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("cmd", choices=["build", "add", "remove"])
+    ap.add_argument("--backbone", default=None)
+    ap.add_argument("--views", type=int, default=None)
+    ap.add_argument("--image")
+    ap.add_argument("--sku")
+    a = ap.parse_args()
+    cfg = load_config()
+    bb = a.backbone or cfg["recognizer"]["backbone"]
+    folder = index_dir(cfg, bb, a.views)
+    t0 = time.time()
+    if a.cmd == "build":
+        g = build(cfg, bb, a.views, folder)
+        print(f"built {len(g)} products x {g.emb.shape[1]} views -> {folder} ({g.nbytes / 2**20:.1f} MB)")
+        return
+    if not a.sku:
+        ap.error("--sku is required")
+    g = Gallery.load(folder)
+    if a.cmd == "add":
+        if not a.image or not Path(a.image).exists():
+            ap.error("--image must be an existing file")
+        img = Image.open(a.image).convert("RGB")
+        emb = Embedder(bb, cfg["recognizer"]["backbones"][bb], get_device(cfg))
+        g.add(a.sku, embed_product(img, a.sku, emb, cfg, a.views), Sift(cfg["recognizer"]["sift"]).features(img))
+    else:
+        if g.index_of(a.sku) is None:
+            raise SystemExit(f"{a.sku} is not in the gallery")
+        g.remove(a.sku)
+    g.save(folder)
+    print(f"{a.cmd} {a.sku}: gallery now {len(g)} products, {time.time() - t0:.1f}s (includes model load)")
 
-        Args:
-            gallery_dir: Root directory of reference images (e.g. data/grozi/Training).
-            extractor: FeatureExtractor instance.
-            batch_size: Batch size for feature extraction.
-            valid_extensions: Tuple of file extensions considered valid image files.
 
-        Returns:
-            Total count of images successfully added to the gallery.
-        """
-        root_path = Path(gallery_dir)
-        if not root_path.exists():
-            raise FileNotFoundError(f"Gallery directory does not exist: {root_path}")
-
-        image_paths: List[Path] = []
-        for ext in valid_extensions:
-            image_paths.extend(root_path.rglob(f"*{ext}"))
-            image_paths.extend(root_path.rglob(f"*{ext.upper()}"))
-
-        image_paths = sorted(list(set(image_paths)))
-        if not image_paths:
-            print(f"Warning: No valid images found in {root_path}")
-            return 0
-
-        print(f"Building gallery index from {len(image_paths)} images in {root_path}...")
-
-        batch_images: List[Image.Image] = []
-        batch_meta: List[Dict[str, Any]] = []
-
-        for idx, img_p in enumerate(image_paths):
-            try:
-                img = Image.open(img_p).convert("RGB")
-                rel_path = img_p.relative_to(root_path)
-                sku_id = str(rel_path.with_suffix("")).replace("\\", "/")
-                category = str(rel_path.parent).replace("\\", "/")
-
-                batch_images.append(img)
-                batch_meta.append({
-                    "sku_id": sku_id,
-                    "image_path": str(img_p),
-                    "category": category
-                })
-            except Exception as e:
-                print(f"Skipping corrupt image {img_p}: {e}")
-                continue
-
-            if len(batch_images) == batch_size or (idx == len(image_paths) - 1 and batch_images):
-                embeddings = extractor.extract_batch(batch_images, batch_size=batch_size)
-                self.index.add(embeddings.astype(np.float32))
-
-                for m in batch_meta:
-                    m["index_id"] = len(self.metadata)
-                    self.metadata.append(m)
-
-                batch_images = []
-                batch_meta = []
-                if (idx + 1) % 500 == 0 or idx == len(image_paths) - 1:
-                    print(f"  Indexed {self.index.ntotal}/{len(image_paths)} references...")
-
-        return self.index.ntotal
-
-    def search(
-        self,
-        query_embeddings: np.ndarray,
-        top_k: int = 5
-    ) -> List[List[Dict[str, Any]]]:
-        """Performs nearest-neighbor search for one or multiple query vectors.
-
-        Args:
-            query_embeddings: 2D array of shape (N, embedding_dim) normalized to unit length.
-            top_k: Number of nearest matches to return per query vector.
-
-        Returns:
-            List of size N, where each element is a list of top_k dictionaries:
-            [{'sku_id': str, 'score': float, 'category': str, 'image_path': str}, ...]
-        """
-        if self.index.ntotal == 0:
-            return [[] for _ in range(len(query_embeddings))]
-
-        assert query_embeddings.ndim == 2, f"Expected 2D query array, got shape {query_embeddings.shape}"
-        assert query_embeddings.shape[1] == self.embedding_dim, (
-            f"Query feature dimension {query_embeddings.shape[1]} doesn't match index {self.embedding_dim}"
-        )
-
-        k = min(top_k, self.index.ntotal)
-        scores, indices = self.index.search(query_embeddings.astype(np.float32), k)
-
-        results: List[List[Dict[str, Any]]] = []
-        for b in range(query_embeddings.shape[0]):
-            b_results: List[Dict[str, Any]] = []
-            for rank in range(k):
-                idx = indices[b][rank]
-                if idx < 0 or idx >= len(self.metadata):
-                    continue
-                score = float(scores[b][rank])
-                meta = self.metadata[idx].copy()
-                meta["score"] = score
-                meta["rank"] = rank + 1
-                b_results.append(meta)
-            results.append(b_results)
-
-        return results
-
-    def save(self, output_dir: Union[str, Path]) -> None:
-        """Persists the Faiss index and metadata JSON to disk.
-
-        Args:
-            output_dir: Target directory for index and metadata files.
-        """
-        out = Path(output_dir)
-        out.mkdir(parents=True, exist_ok=True)
-
-        faiss_path = out / "gallery.index"
-        meta_path = out / "gallery_metadata.json"
-
-        faiss.write_index(self.index, str(faiss_path))
-        with open(meta_path, "w", encoding="utf-8") as f:
-            json.dump(self.metadata, f, indent=2)
-
-        print(f"Gallery saved successfully: {self.index.ntotal} SKUs -> {out}")
-
-    def load(self, input_dir: Union[str, Path]) -> None:
-        """Loads a persisted Faiss index and metadata JSON from disk.
-
-        Args:
-            input_dir: Directory containing gallery.index and gallery_metadata.json.
-
-        Raises:
-            FileNotFoundError: If index or metadata file is missing.
-        """
-        inp = Path(input_dir)
-        faiss_path = inp / "gallery.index"
-        meta_path = inp / "gallery_metadata.json"
-
-        if not faiss_path.exists():
-            raise FileNotFoundError(f"Missing Faiss index file: {faiss_path}")
-        if not meta_path.exists():
-            raise FileNotFoundError(f"Missing gallery metadata: {meta_path}")
-
-        self.index = faiss.read_index(str(faiss_path))
-        self.embedding_dim = self.index.d
-
-        with open(meta_path, "r", encoding="utf-8") as f:
-            self.metadata = json.load(f)
-
-        assert len(self.metadata) == self.index.ntotal, (
-            f"Loaded metadata size ({len(self.metadata)}) != index total ({self.index.ntotal})"
-        )
-        print(f"Gallery loaded: {self.index.ntotal} SKUs from {inp}")
+if __name__ == "__main__":
+    main()

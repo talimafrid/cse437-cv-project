@@ -31,7 +31,6 @@ data/*.zip
 # SKU-110K images intentionally NOT tracked (too large for GitHub)
 data/sku110k_yolo/images/
 !data/sku110k/annotations/
-!data/sku110k_yolo/labels/
 !data/gp180/
 !data/grozi/bb/
 !data/grozi/planos/
@@ -48,3 +47,6 @@ runs/
 
 # Jupyter
 .ipynb_checkpoints/
+# SKU-110K raw + YOLO copy (regenerate with scripts/prepare_data.py; never redistribute, C14)
+data/SKU110K_fixed/
+data/sku110k_yolo/

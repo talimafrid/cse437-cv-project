@@ -1,169 +1,108 @@
+"""F5: seeded violation injection on row planograms, with per-slot ground truth.
+
+The shelf photo stays unchanged (GP-180 photos match their planograms); the planogram is edited,
+so every edited slot is a known violation:
+  swap     two different SKUs in a row exchange places      -> both slots changed
+  replace  a slot gets another product (half same subcategory, the hard case)
+  insert   a new slot that has no product on the shelf       -> should come out "missing"
+  remove   an interior slot is deleted, so its product on the shelf becomes an "extra"
 """
-F5 - Synthetic Violation Injection Module
-==========================================
+from __future__ import annotations
 
-Generates controlled non-compliant test scenarios by perturbing ground-truth
-planograms. This module enables rigorous SQA evaluation of the planogram alignment
-engine under known violation ground truth.
-
-Supported Mutation Operations:
-1. SWAP: Exchanges positions of two SKUs within or between shelves (misplaced facing).
-2. REMOVE: Deletes a required SKU facing (out-of-stock / missing product).
-3. INSERT: Adds an unauthorized or foreign SKU into a shelf sequence (rogue item).
-4. REPLACE: Substitutes an expected SKU with another candidate from a SKU pool.
-
-Every perturbation operation is logged with exact ground-truth labels for metric computation.
-"""
-
-from typing import List, Dict, Tuple, Any, Optional
-import copy
 import random
 
 
-class ViolationInjector:
-    """Generates synthetic non-compliant planograms from valid layouts.
+def subcategory(sku: str) -> str:
+    return sku.rsplit("/", 1)[0]
 
-    Attributes:
-        mutation_rate (float): Target fraction of slots to perturb [0.05, 0.50].
-        operations (List[str]): Allowed operations ('swap', 'remove', 'insert', 'replace').
-        sku_pool (List[str]): Pool of valid SKU identifiers for replacements/insertions.
-        seed (Optional[int]): Random seed for deterministic reproducibility.
-    """
 
-    def __init__(
-        self,
-        mutation_rate: float = 0.15,
-        operations: Optional[List[str]] = None,
-        sku_pool: Optional[List[str]] = None,
-        seed: Optional[int] = 42
-    ) -> None:
-        """Initializes the violation injector.
+def inject(rows: list[list[str]], pool: list[str], seed: int, rate_min=0.10, rate_max=0.20,
+           ops=("swap", "remove", "insert", "replace")):
+    """Returns (new_rows, truth). truth = {"changed": [[bool]] aligned with new_rows,
+    "removed": [(row, gap_pos)], "log": [...]}; gap_pos = number of slots left of the removed one."""
+    rng = random.Random(seed)
+    by_sub = {}
+    for s in pool:
+        by_sub.setdefault(subcategory(s), []).append(s)
+    R = [[{"sku": s, "changed": False} for s in row] for row in rows]
+    n_slots = sum(len(r) for r in rows)
+    n_edits = max(1, round(n_slots * rng.uniform(rate_min, rate_max)))
+    log = []
 
-        Args:
-            mutation_rate: Probability/proportion of mutations applied to planogram (default 15%).
-            operations: Subset of ['swap', 'remove', 'insert', 'replace'].
-            sku_pool: List of reference SKU IDs to pull from when inserting/replacing.
-            seed: Random seed for reproducible experiment generation.
+    def live(r):
+        return [k for k, e in enumerate(R[r]) if not e.get("removed")]
 
-        Raises:
-            ValueError: If mutation_rate is out of valid bounds [0.0, 1.0].
-        """
-        if not (0.0 <= mutation_rate <= 1.0):
-            raise ValueError(f"mutation_rate must be in [0.0, 1.0], got {mutation_rate}")
+    def fresh(r):
+        return [k for k in live(r) if not R[r][k]["changed"]]
 
-        self.mutation_rate = mutation_rate
-        self.operations = operations or ["swap", "remove", "insert", "replace"]
-        self.sku_pool = sku_pool or [
-            f"Food/Snacks/{i}" for i in range(1, 50)
-        ] + [
-            f"Food/Tea/{i}" for i in range(1, 50)
-        ]
-        self.rng = random.Random(seed)
+    def other_product(orig, hard):
+        cands = [s for s in by_sub.get(subcategory(orig), []) if s != orig] if hard else []
+        if not cands:
+            cands = [s for s in pool if s != orig]
+        return rng.choice(cands)
 
-    def inject_violations(
-        self,
-        planogram_rows: List[List[str]]
-    ) -> Tuple[List[List[str]], List[Dict[str, Any]]]:
-        """Applies random perturbations across multi-shelf planogram rows.
+    attempts = 0
+    while len(log) < n_edits and attempts < 50 * n_edits:
+        attempts += 1
+        op = rng.choice(list(ops))
+        r = rng.randrange(len(R))
+        f = fresh(r)
+        if op == "swap":
+            pairs = [(a, b) for a in f for b in f if a < b and R[r][a]["sku"] != R[r][b]["sku"]]
+            if not pairs:
+                continue
+            a, b = rng.choice(pairs)
+            R[r][a]["sku"], R[r][b]["sku"] = R[r][b]["sku"], R[r][a]["sku"]
+            R[r][a]["changed"] = R[r][b]["changed"] = True
+            log.append(dict(op="swap", row=r, slots=[a, b]))
+        elif op == "replace":
+            if not f:
+                continue
+            k = rng.choice(f)
+            hard = rng.random() < 0.5
+            old = R[r][k]["sku"]
+            R[r][k].update(sku=other_product(old, hard), changed=True)
+            log.append(dict(op="replace", row=r, slot=k, old=old, new=R[r][k]["sku"], hard=hard))
+        elif op == "insert":
+            pos = rng.randint(0, len(R[r]))
+            new = other_product(rng.choice(rows[r]), rng.random() < 0.5)
+            R[r].insert(pos, {"sku": new, "changed": True})
+            log.append(dict(op="insert", row=r, sku=new))
+        elif op == "remove":
+            lv = live(r)
+            interior = [k for k in f if lv and lv[0] < k < lv[-1]
+                        and not R[r][k - 1].get("removed") and not R[r][k + 1].get("removed")]
+            if not interior:
+                continue
+            k = rng.choice(interior)
+            R[r][k]["removed"] = True
+            log.append(dict(op="remove", row=r, sku=R[r][k]["sku"]))
 
-        Args:
-            planogram_rows: Original ground-truth planogram rows (top-to-bottom, left-to-right).
+    new_rows, changed, removed = [], [], []
+    for r, row in enumerate(R):
+        kept = []
+        for e in row:
+            if e.get("removed"):
+                removed.append((r, len(kept)))
+            else:
+                kept.append(e)
+        new_rows.append([e["sku"] for e in kept])
+        changed.append([e["changed"] for e in kept])
+    return new_rows, {"changed": changed, "removed": removed, "log": log}
 
-        Returns:
-            Tuple of:
-                - Perturbed planogram rows (List[List[str]])
-                - Mutation log (List[Dict[str, Any]]) recording exact edits for verification:
-                  [{
-                     'operation': 'swap' | 'remove' | 'insert' | 'replace',
-                     'row_idx': int,
-                     'col_idx': int,
-                     'details': str
-                  }, ...]
 
-        Raises:
-            ValueError: If input planogram_rows is empty.
-        """
-        if not planogram_rows:
-            raise ValueError("Cannot inject violations into an empty planogram.")
-
-        # Deep copy to ensure original planogram remains pristine
-        perturbed: List[List[str]] = [list(r) for r in planogram_rows]
-        mutation_log: List[Dict[str, Any]] = []
-
-        total_slots = sum(len(r) for r in perturbed)
-        if total_slots == 0:
-            return perturbed, []
-
-        num_mutations = max(1, int(round(total_slots * self.mutation_rate)))
-
-        for _ in range(num_mutations):
-            op = self.rng.choice(self.operations)
-            # Pick a non-empty row if available
-            available_rows = [i for i, r in enumerate(perturbed) if len(r) > 0]
-            if not available_rows:
-                break
-
-            r_idx = self.rng.choice(available_rows)
-            row = perturbed[r_idx]
-
-            if op == "swap":
-                if len(row) >= 2:
-                    idx1, idx2 = self.rng.sample(range(len(row)), 2)
-                    item1, item2 = row[idx1], row[idx2]
-                    row[idx1], row[idx2] = item2, item1
-                    mutation_log.append({
-                        "operation": "swap",
-                        "row_idx": r_idx,
-                        "col_idx": idx1,
-                        "details": f"Swapped SKU '{item1}' (col {idx1}) with '{item2}' (col {idx2})"
-                    })
-                elif len(available_rows) >= 2:
-                    # Cross-row swap if single-item rows
-                    r2_idx = self.rng.choice([i for i in available_rows if i != r_idx])
-                    idx1 = 0
-                    idx2 = self.rng.randrange(len(perturbed[r2_idx]))
-                    item1, item2 = perturbed[r_idx][idx1], perturbed[r2_idx][idx2]
-                    perturbed[r_idx][idx1], perturbed[r2_idx][idx2] = item2, item1
-                    mutation_log.append({
-                        "operation": "swap",
-                        "row_idx": r_idx,
-                        "col_idx": idx1,
-                        "details": f"Cross-shelf swapped row {r_idx} item '{item1}' with row {r2_idx} item '{item2}'"
-                    })
-
-            elif op == "remove":
-                if len(row) > 0:
-                    del_idx = self.rng.randrange(len(row))
-                    removed_item = row.pop(del_idx)
-                    mutation_log.append({
-                        "operation": "remove",
-                        "row_idx": r_idx,
-                        "col_idx": del_idx,
-                        "details": f"Removed SKU '{removed_item}' at position {del_idx}"
-                    })
-
-            elif op == "insert":
-                ins_idx = self.rng.randint(0, len(row))
-                new_sku = self.rng.choice(self.sku_pool)
-                row.insert(ins_idx, new_sku)
-                mutation_log.append({
-                    "operation": "insert",
-                    "row_idx": r_idx,
-                    "col_idx": ins_idx,
-                    "details": f"Inserted foreign SKU '{new_sku}' at position {ins_idx}"
-                })
-
-            elif op == "replace":
-                if len(row) > 0:
-                    rep_idx = self.rng.randrange(len(row))
-                    old_sku = row[rep_idx]
-                    new_sku = self.rng.choice(self.sku_pool)
-                    row[rep_idx] = new_sku
-                    mutation_log.append({
-                        "operation": "replace",
-                        "row_idx": r_idx,
-                        "col_idx": rep_idx,
-                        "details": f"Replaced SKU '{old_sku}' with foreign SKU '{new_sku}' at position {rep_idx}"
-                    })
-
-        return perturbed, mutation_log
+def score(slots: list[dict], extras: list[dict], truth: dict) -> dict:
+    """Counts for A5. A changed slot is caught when its status is not "correct"; a removal is
+    caught when an extra detection is reported at the same gap position of the same row."""
+    tp = fn = fa = ok = 0
+    for s in slots:
+        flagged = s["status"] != "correct"
+        if truth["changed"][s["row"]][s["col"]]:
+            tp += flagged; fn += not flagged
+        else:
+            fa += flagged; ok += not flagged
+    extra_pos = {(e["row"], e["gap_pos"]) for e in extras}
+    rem_tp = sum(1 for rp in truth["removed"] if tuple(rp) in extra_pos)
+    rem_fn = len(truth["removed"]) - rem_tp
+    return dict(viol_detected=tp + rem_tp, viol_total=tp + fn + rem_tp + rem_fn,
+                false_alarms=fa, unchanged_total=fa + ok)

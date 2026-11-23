@@ -1,186 +1,129 @@
-"""
-Shared Utilities Module
-========================
+"""Config, seeding, image helpers, box maths and the audit overlay."""
+from __future__ import annotations
 
-Provides common functionality across all modules:
-- Safe image I/O with PIL and OpenCV format conversion.
-- Crop extraction from bounding boxes with boundary clamping.
-- Planogram audit visualizer: renders color-coded bounding boxes on shelf images:
-    - GREEN: Correct SKU facing.
-    - RED: Misplaced SKU facing.
-    - BLUE: Unknown SKU (open-set reject).
-    - YELLOW: Missing SKU marker.
-- YAML configuration loading with default fallbacks.
-"""
-
-from typing import List, Dict, Tuple, Any, Optional, Union
+import json
 import os
+import random
 from pathlib import Path
-import yaml
+
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+import yaml
+from PIL import Image, ImageDraw
 
+ROOT = Path(__file__).resolve().parents[1]
 
-# Standard color palette for planogram audit visualization (RGB)
 STATUS_COLORS = {
-    "CORRECT": (46, 204, 113),       # Emerald Green
-    "MISPLACED": (231, 76, 60),      # Coral Red
-    "UNKNOWN": (52, 152, 219),       # Bright Blue
-    "MISSING": (241, 196, 15),       # Sun Yellow
-    "DEFAULT": (149, 165, 166)       # Gray
+    "correct": (46, 204, 113),
+    "misplaced": (231, 76, 60),
+    "unknown": (52, 152, 219),
+    "missing": (241, 196, 15),
+    "extra": (155, 89, 182),
 }
 
 
-def load_config(config_path: Union[str, Path] = "configs/config.yaml") -> Dict[str, Any]:
-    """Loads a YAML configuration file into a dictionary.
-
-    Args:
-        config_path: Path to the YAML file.
-
-    Returns:
-        Configuration dictionary.
-
-    Raises:
-        FileNotFoundError: If configuration file is missing.
-    """
-    p = Path(config_path)
-    if not p.exists():
-        raise FileNotFoundError(f"Config file not found at: {p}")
-
-    with open(p, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+def load_config(path: str | Path = ROOT / "configs" / "config.yaml") -> dict:
+    """Loads the YAML config and makes every relative path absolute against the repo root."""
+    cfg = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    cfg["paths"] = {k: str((ROOT / v).resolve()) for k, v in cfg["paths"].items()}
+    return cfg
 
 
-def load_image_rgb(image_input: Union[str, Path, Image.Image, np.ndarray]) -> Image.Image:
-    """Loads or converts any image representation into a standardized PIL RGB Image.
-
-    Args:
-        image_input: File path, PIL Image, or NumPy array.
-
-    Returns:
-        PIL.Image in RGB mode.
-
-    Raises:
-        FileNotFoundError: If path string does not exist.
-        ValueError: If input format cannot be interpreted.
-    """
-    if isinstance(image_input, (str, Path)):
-        p = Path(image_input)
-        if not p.exists():
-            raise FileNotFoundError(f"Image not found at: {p}")
-        return Image.open(p).convert("RGB")
-
-    elif isinstance(image_input, Image.Image):
-        return image_input.convert("RGB")
-
-    elif isinstance(image_input, np.ndarray):
-        assert image_input.size > 0, "Input image array is empty."
-        if image_input.ndim == 2:
-            return Image.fromarray(image_input).convert("RGB")
-        elif image_input.ndim == 3:
-            # Assume BGR if coming from cv2, else RGB
-            if image_input.shape[2] == 3:
-                return Image.fromarray(image_input)
-            elif image_input.shape[2] == 4:
-                return Image.fromarray(image_input).convert("RGB")
-
-    raise TypeError(f"Unsupported image type: {type(image_input)}")
+def save_config_values(updates: dict, path: str | Path = ROOT / "configs" / "config.yaml"):
+    """Writes tuned values back into config.yaml (keys as dotted paths)."""
+    cfg = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    for dotted, value in updates.items():
+        node = cfg
+        *parents, leaf = dotted.split(".")
+        for k in parents:
+            node = node[k]
+        node[leaf] = value
+    Path(path).write_text(yaml.safe_dump(cfg, sort_keys=False, allow_unicode=True), encoding="utf-8")
 
 
-def extract_crops(
-    image: Image.Image,
-    bboxes: List[List[float]],
-    is_normalized: bool = False
-) -> List[Image.Image]:
-    """Extracts bounding box crops from a shelf image with boundary clamping.
+def seed_everything(seed: int):
+    random.seed(seed)
+    np.random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    try:
+        import torch
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    except ImportError:
+        pass
 
-    Args:
-        image: Source shelf PIL Image.
-        bboxes: List of [x1, y1, x2, y2] coordinates.
-        is_normalized: If True, coords are in range [0, 1] and will be scaled.
 
-    Returns:
-        List of cropped PIL Images.
-    """
-    w, h = image.size
-    crops: List[Image.Image] = []
+def get_device(cfg: dict) -> str:
+    if cfg.get("device", "auto") != "auto":
+        return cfg["device"]
+    import torch
+    return "cuda" if torch.cuda.is_available() else "cpu"
 
-    for b in bboxes:
-        assert len(b) == 4, f"Invalid bbox: {b}"
-        x1, y1, x2, y2 = b
 
-        # Guard against NaN / Inf values from malformed annotation CSVs
-        if any(np.isnan([x1, y1, x2, y2])) or any(np.isinf([x1, y1, x2, y2])):
+def load_rgb(path_or_img) -> Image.Image:
+    """Path, PIL image, or RGB numpy array -> PIL RGB. Numpy input must already be RGB."""
+    if isinstance(path_or_img, (str, Path)):
+        return Image.open(path_or_img).convert("RGB")
+    if isinstance(path_or_img, np.ndarray):
+        return Image.fromarray(path_or_img).convert("RGB")
+    return path_or_img.convert("RGB")
+
+
+def crop(img: Image.Image, box) -> Image.Image:
+    w, h = img.size
+    x1, y1, x2, y2 = box
+    x1, y1 = max(0, int(x1)), max(0, int(y1))
+    x2, y2 = min(w, max(x1 + 1, int(round(x2)))), min(h, max(y1 + 1, int(round(y2))))
+    return img.crop((x1, y1, x2, y2))
+
+
+def iou_matrix(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Pairwise IoU between (N,4) and (M,4) xyxy boxes."""
+    a = np.asarray(a, dtype=np.float64).reshape(-1, 4)
+    b = np.asarray(b, dtype=np.float64).reshape(-1, 4)
+    ix1 = np.maximum(a[:, None, 0], b[None, :, 0])
+    iy1 = np.maximum(a[:, None, 1], b[None, :, 1])
+    ix2 = np.minimum(a[:, None, 2], b[None, :, 2])
+    iy2 = np.minimum(a[:, None, 3], b[None, :, 3])
+    inter = np.clip(ix2 - ix1, 0, None) * np.clip(iy2 - iy1, 0, None)
+    area = lambda z: (z[:, 2] - z[:, 0]) * (z[:, 3] - z[:, 1])
+    return inter / (area(a)[:, None] + area(b)[None, :] - inter + 1e-9)
+
+
+def nms(boxes: np.ndarray, scores: np.ndarray, iou: float) -> np.ndarray:
+    """Greedy NMS, returns kept indices (sorted by score)."""
+    order = np.argsort(-scores)
+    keep = []
+    while order.size:
+        i = order[0]
+        keep.append(i)
+        if order.size == 1:
+            break
+        ious = iou_matrix(boxes[i:i + 1], boxes[order[1:]])[0]
+        order = order[1:][ious <= iou]
+    return np.array(keep, dtype=int)
+
+
+def draw_audit(img: Image.Image, slots: list[dict], extras: list[dict] = ()) -> Image.Image:
+    """Draws each slot box coloured by status with its SKU label. Missing slots have no box."""
+    out = img.copy()
+    d = ImageDraw.Draw(out)
+    lw = max(3, out.size[0] // 600)
+    for s in list(slots) + list(extras):
+        if s.get("box") is None:
             continue
-
-        if is_normalized:
-            x1, x2 = x1 * w, x2 * w
-            y1, y2 = y1 * h, y2 * h
-
-        # Clamp to image boundaries
-        left = max(0, min(int(round(x1)), w - 1))
-        top = max(0, min(int(round(y1)), h - 1))
-        right = max(left + 1, min(int(round(x2)), w))
-        bottom = max(top + 1, min(int(round(y2)), h))
-
-        crop = image.crop((left, top, right, bottom))
-        crops.append(crop)
-
-    return crops
+        status = s["status"]
+        color = STATUS_COLORS.get(status, (150, 150, 150))
+        x1, y1, x2, y2 = s["box"]
+        d.rectangle([x1, y1, x2, y2], outline=color, width=lw)
+        label = f"{status}: {(s.get('detected') or '?').split('/')[-1]}"
+        if status != "correct" and s.get("expected"):
+            label += f" (want {s['expected'].split('/')[-1]})"
+        tw = 7 * len(label) * lw // 3
+        d.rectangle([x1, max(0, y1 - 6 * lw), x1 + tw, y1], fill=color)
+        d.text((x1 + lw, max(0, y1 - 6 * lw)), label, fill=(255, 255, 255))
+    return out
 
 
-def draw_planogram_audit(
-    image: Image.Image,
-    aligned_results: List[Dict[str, Any]],
-    box_width: int = 3
-) -> Image.Image:
-    """Renders color-coded bounding boxes and labels for each aligned shelf slot.
-
-    Color coding:
-    - GREEN: CORRECT facing
-    - RED: MISPLACED product facing
-    - BLUE: UNKNOWN (failed open-set threshold)
-    - YELLOW: MISSING product facing (rendered at estimated position)
-
-    Args:
-        image: Base shelf PIL Image.
-        aligned_results: Flattened list of aligned slot dictionaries:
-            [{
-               'expected_sku': str,
-               'detected_sku': str,
-               'status': 'CORRECT'|'MISPLACED'|'UNKNOWN'|'MISSING',
-               'detection_info': {'bbox': [x1, y1, x2, y2], ...}
-            }, ...]
-        box_width: Thickness of bounding box borders.
-
-    Returns:
-        Annotated PIL Image.
-    """
-    canvas = image.copy()
-    draw = ImageDraw.Draw(canvas)
-    w, h = canvas.size
-
-    for slot in aligned_results:
-        status = slot.get("status", "DEFAULT")
-        color = STATUS_COLORS.get(status, STATUS_COLORS["DEFAULT"])
-        det_info = slot.get("detection_info")
-
-        if det_info and "bbox" in det_info:
-            b = det_info["bbox"]
-            x1, y1, x2, y2 = b
-
-            # Support normalized coordinates if needed
-            if max(x1, x2, y1, y2) <= 1.0:
-                x1, x2 = x1 * w, x2 * w
-                y1, y2 = y1 * h, y2 * h
-
-            # Draw rectangle
-            draw.rectangle([x1, y1, x2, y2], outline=color, width=box_width)
-
-            # Draw label banner
-            detected_sku = slot.get("detected_sku") or "UNKNOWN"
-            label = f"{status}: {detected_sku.split('/')[-1]}"
-            draw.rectangle([x1, max(0, y1 - 18), x1 + len(label) * 8, y1], fill=color)
-            draw.text((x1 + 2, max(0, y1 - 16)), label, fill=(255, 255, 255))
-
-    return canvas
+def dump_json(obj, path: str | Path):
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(json.dumps(obj, indent=2), encoding="utf-8")

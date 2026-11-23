@@ -1,151 +1,161 @@
-"""
-End-to-End Compliance Pipeline Module
-======================================
+"""End-to-end audit: detect -> recognise (+ open-set) -> group rows -> align with planogram -> report.
 
-Orchestrates the entire multi-stage retail audit workflow:
-1. Product Detection (YOLOv8 or Ground Truth Bounding Boxes for evaluation).
-2. Feature Extraction (ResNet-50 2048-d unit-normalized embeddings).
-3. SKU Recognition & Open-Set Rejection (SKUMatcher vs. Faiss GalleryIndex).
-4. Spatial Row Clustering (ShelfRowClusterer: top-to-bottom, left-to-right).
-5. Planogram Sequence Alignment (PlanogramAligner: edit distance).
-6. Compliance Scoring & Annotated Visual Output Generation.
+CLI (F7):
+  python -m src.pipeline --image shelf.jpg --planogram outputs/planograms/s1_14.json [--out outputs/audit]
 """
+from __future__ import annotations
 
-from typing import List, Dict, Tuple, Any, Optional, Union
+import argparse
+import csv
+import json
 import time
 from pathlib import Path
+
 import numpy as np
-from PIL import Image
 
-from src.recognizer import FeatureExtractor, SKUMatcher
-from src.gallery import GalleryIndex
-from src.planogram import ShelfRowClusterer, PlanogramAligner
-from src.utils import load_image_rgb, extract_crops, draw_planogram_audit
+from src.gallery import Gallery, index_dir
+from src.planogram import align_shelf, compliance, group_rows
+from src.recognizer import Embedder, Sift, known_probability, openset_features
+from src.utils import crop, draw_audit, dump_json, get_device, load_config, load_rgb
 
 
-class PlanogramCompliancePipeline:
-    """End-to-end shelf auditing engine.
+class Recognizer:
+    """Retrieval + SIFT re-ranking + open-set decision + 1:1 verification for one batch of crops."""
 
-    Attributes:
-        extractor (FeatureExtractor): Visual feature extraction network.
-        gallery (GalleryIndex): Vector index of reference SKUs.
-        matcher (SKUMatcher): Nearest-neighbor search + open-set classifier.
-        clusterer (ShelfRowClusterer): 2D bbox row clustering algorithm.
-        aligner (PlanogramAligner): Sequence alignment and compliance auditor.
-    """
+    def __init__(self, cfg: dict, gallery: Gallery, embedder: Embedder | None, sift: Sift | None):
+        self.cfg, self.g, self.emb, self.sift = cfg, gallery, embedder, sift
+        self.rc = cfg["recognizer"]
 
-    def __init__(
-        self,
-        gallery: GalleryIndex,
-        extractor: Optional[FeatureExtractor] = None,
-        match_threshold: float = 0.65,
-        reject_threshold: float = 0.40,
-        vertical_tolerance: float = 0.50
-    ) -> None:
-        """Initializes all sub-modules for the compliance pipeline.
+    def recognize(self, crops, rerank: bool = True, use_sift_features: bool = True, q=None, qf=None) -> dict:
+        """q: precomputed embeddings, qf: precomputed SIFT features of the crops (evaluation caches)."""
+        rc, k = self.rc, self.rc["top_k"]
+        if q is None:
+            q = self.emb.embed(crops, rc["batch_size"])
+        S = self.g.scores(q)
+        top = np.argsort(-S, axis=1)[:, :k]
+        top_s = np.take_along_axis(S, top, axis=1)
+        n = len(crops)
+        inl, hull = np.zeros(n), np.zeros(n)
+        qf = list(qf) if qf is not None else [None] * n
+        if self.sift is not None and use_sift_features:
+            sc = rc["sift"]
+            for i in range(n):
+                if qf[i] is None:
+                    qf[i] = self.sift.features(crops[i])
+                ambiguous = rerank and (top_s[i, 0] - top_s[i, 1]) < sc["rerank_margin"]
+                cand = range(k) if ambiguous else range(1)
+                res = {c: self.sift.match(qf[i], self.g.sift[self.g.skus[top[i, c]]]) for c in cand
+                       if self.g.skus[top[i, c]] in self.g.sift}
+                if ambiguous and res:
+                    new = top_s[i] + np.array([sc["rerank_lambda"] * min(res.get(c, (0, 0))[0], 50) / 50 for c in range(k)])
+                    order = np.argsort(-new)
+                    top[i], top_s[i] = top[i, order], top_s[i, order]
+                    res = {list(order).index(c): v for c, v in res.items()}
+                inl[i], hull[i] = res.get(0, (0, 0.0))
+        feats = openset_features(top_s, inl, hull)
+        os_cfg = rc["openset"]
+        p_known = known_probability(feats, os_cfg["coef"]) if os_cfg.get("coef") else feats[:, 0]
+        unknown = p_known < os_cfg["threshold"]
+        self._last = dict(S=S, qf=qf, crops=crops)
+        return dict(top=top, top_scores=top_s, inliers=inl, hull=hull, feats=feats, p_known=p_known,
+                    unknown=unknown, labels=[("unknown" if u else self.g.skus[t[0]]) for u, t in zip(unknown, top)])
 
-        Args:
-            gallery: Populated GalleryIndex instance.
-            extractor: Optional FeatureExtractor (if None, instantiates default ResNet50).
-            match_threshold: Confirmed SKU match similarity cutoff [0, 1].
-            reject_threshold: Similarity cutoff below which items are flagged UNKNOWN.
-            vertical_tolerance: Relative vertical margin multiplier for row grouping.
-        """
-        assert gallery is not None, "GalleryIndex cannot be None."
-        self.gallery = gallery
-        self.extractor = extractor or FeatureExtractor()
-        self.matcher = SKUMatcher(match_threshold=match_threshold, reject_threshold=reject_threshold)
-        self.clusterer = ShelfRowClusterer(vertical_tolerance=vertical_tolerance)
-        self.aligner = PlanogramAligner()
+    def verify(self, i: int, sku: str) -> bool:
+        """Is crop i the product `sku`? Embedding near the top, or enough SIFT inliers."""
+        j = self.g.index_of(sku)
+        if j is None:
+            return False
+        S, vc = self._last["S"], self.rc["verify"]
+        if S[i, j] >= S[i].max() - vc["delta"]:
+            return True
+        if self.sift is None or sku not in self.g.sift:
+            return False
+        key = (i, sku)
+        cache = self._last.setdefault("vcache", {})
+        if key not in cache:
+            qf = self._last["qf"][i] or self.sift.features(self._last["crops"][i])
+            cache[key] = self.sift.match(qf, self.g.sift[sku])[0]
+        return cache[key] >= vc["min_inliers"]
 
-    def audit_shelf(
-        self,
-        shelf_image: Union[str, Path, Image.Image, np.ndarray],
-        expected_planogram_rows: List[List[str]],
-        detected_boxes: Optional[List[List[float]]] = None,
-        is_normalized_boxes: bool = False
-    ) -> Dict[str, Any]:
-        """Audits a shelf image against an expected reference planogram.
 
-        Args:
-            shelf_image: Raw shelf image (filepath, PIL Image, or ndarray).
-            expected_planogram_rows: Expected SKU layout (list of rows, each having list of SKU IDs).
-            detected_boxes: Optional list of bounding boxes [x1, y1, x2, y2].
-                If None, you can plug in YOLOv8 detector outputs.
-            is_normalized_boxes: Whether detected_boxes coordinates are normalized to [0, 1].
+class Pipeline:
+    def __init__(self, cfg: dict | None = None, backbone: str | None = None, detector=True, sift=True,
+                 gallery: Gallery | None = None):
+        self.cfg = cfg or load_config()
+        dev = get_device(self.cfg)
+        bb = backbone or self.cfg["recognizer"]["backbone"]
+        self.gallery = gallery or Gallery.load(index_dir(self.cfg, bb), with_sift=sift)
+        emb = Embedder(bb, self.cfg["recognizer"]["backbones"][bb], dev)
+        self.rec = Recognizer(self.cfg, self.gallery, emb, Sift(self.cfg["recognizer"]["sift"]) if sift else None)
+        self.det = None
+        if detector:
+            from src.detector import Detector
+            self.det = Detector(self.cfg["detector"]["weights"], dev)
 
-        Returns:
-            Dictionary containing:
-                - 'overall_compliance_rate': Percentage compliance [0.0, 100.0].
-                - 'total_summary': Aggregated counts of CORRECT, MISPLACED, MISSING, UNKNOWN.
-                - 'row_alignments': Detailed slot-by-slot alignment for each shelf row.
-                - 'annotated_image': PIL Image with color-coded audit visualization.
-                - 'inference_time_seconds': Total wall-clock time taken.
-        """
-        start_time = time.perf_counter()
-        img = load_image_rgb(shelf_image)
+    def run(self, image, plan_rows: list[list[str]], boxes=None, two_level=True) -> dict:
+        t = {}
+        t0 = time.perf_counter()
+        img = load_rgb(image)
+        if boxes is None:
+            p = self.cfg["detector"]["predict"]
+            boxes, scores = self.det.predict(img, p["scales"], p["shrink"], p["conf"], p["iou"], p["max_det"])
+        else:
+            boxes, scores = np.asarray(boxes, float).reshape(-1, 4), np.ones(len(boxes))
+        t["detect"] = time.perf_counter() - t0
+        t1 = time.perf_counter()
+        crops = [crop(img, b) for b in boxes]
+        rec = self.rec.recognize(crops) if crops else None
+        t["recognize"] = time.perf_counter() - t1
+        t2 = time.perf_counter()
+        pc = self.cfg["planogram"]
+        rows = group_rows(boxes, pc["row_gap"])
+        unknown = (lambda d: bool(rec["unknown"][d])) if rec else (lambda d: True)
+        slots, extras = align_shelf(plan_rows, rows, self.rec.verify, unknown, pc["gap_cost"],
+                                    pc["unknown_cost"], two_level, pc["swap_ratio"],
+                                    pc["end_cost"])
+        t["align"] = time.perf_counter() - t2
+        t["total"] = time.perf_counter() - t0
+        for s in slots + extras:
+            d = s["det"]
+            s["box"] = None if d is None else [round(float(v), 1) for v in boxes[d]]
+            s["detected"] = None if d is None else rec["labels"][d]
+            s["score"] = None if d is None else round(float(rec["top_scores"][d, 0]), 4)
+        return dict(boxes=boxes, scores=scores, rows=rows, rec=rec, slots=slots, extras=extras,
+                    compliance=compliance(slots), timing=t, image=img)
 
-        if not detected_boxes:
-            # No products detected on shelf
-            elapsed = time.perf_counter() - start_time
-            return {
-                "overall_compliance_rate": 0.0,
-                "total_summary": {"CORRECT": 0, "MISPLACED": 0, "MISSING": sum(len(r) for r in expected_planogram_rows), "UNKNOWN": 0},
-                "row_alignments": [],
-                "annotated_image": img,
-                "inference_time_seconds": round(elapsed, 4)
-            }
 
-        # Filter valid bounding boxes (drop NaNs / Infs from corrupted datasets)
-        valid_boxes = []
-        for b in detected_boxes:
-            if len(b) == 4 and not any(np.isnan(b)) and not any(np.isinf(b)):
-                valid_boxes.append(b)
+def write_report(res: dict, out_dir: Path, stem: str):
+    """F7: annotated image, report JSON and per-slot CSV."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    draw_audit(res["image"], res["slots"], res["extras"]).save(out_dir / f"{stem}_audit.jpg", quality=90)
+    keys = ["row", "col", "expected", "detected", "status", "score", "box"]
+    counts = {k: sum(s["status"] == k for s in res["slots"]) for k in ("correct", "misplaced", "missing", "unknown")}
+    dump_json(dict(image=stem, compliance=round(res["compliance"], 4), counts=counts, n_extra=len(res["extras"]),
+                   timing_s={k: round(v, 3) for k, v in res["timing"].items()},
+                   slots=[{k: s.get(k) for k in keys} for s in res["slots"]],
+                   extras=[{k: s.get(k) for k in ("row", "gap_pos", "detected", "box")} for s in res["extras"]]),
+              out_dir / f"{stem}_report.json")
+    with open(out_dir / f"{stem}_report.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, keys)
+        w.writeheader()
+        for s in res["slots"]:
+            w.writerow({k: s.get(k) for k in keys})
 
-        if not valid_boxes:
-            elapsed = time.perf_counter() - start_time
-            return {
-                "overall_compliance_rate": 0.0,
-                "total_summary": {"CORRECT": 0, "MISPLACED": 0, "MISSING": sum(len(r) for r in expected_planogram_rows), "UNKNOWN": 0},
-                "row_alignments": [],
-                "annotated_image": img,
-                "inference_time_seconds": round(elapsed, 4)
-            }
 
-        # 1. Crop each product facing from the shelf image
-        crops = extract_crops(img, valid_boxes, is_normalized=is_normalized_boxes)
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--image", required=True)
+    ap.add_argument("--planogram", required=True, help="row planogram JSON (outputs/planograms/*.json)")
+    ap.add_argument("--out", default=None)
+    a = ap.parse_args()
+    cfg = load_config()
+    pipe = Pipeline(cfg)
+    rows = json.loads(Path(a.planogram).read_text())["rows"]
+    res = pipe.run(a.image, rows)
+    out = Path(a.out or Path(cfg["paths"]["outputs"]) / "audit")
+    write_report(res, out, Path(a.image).stem)
+    print(f"compliance {res['compliance']:.1%}  timing {res['timing']['total']:.2f}s  -> {out}")
 
-        # 2. Extract visual embeddings in batch
-        embeddings = self.extractor.extract_batch(crops, batch_size=64)
 
-        # 3. Recognize SKUs and evaluate open-set rejection threshold
-        detections: List[Dict[str, Any]] = []
-        for idx, (box, emb) in enumerate(zip(valid_boxes, embeddings)):
-            match_res = self.matcher.match(emb, self.gallery)
-            detections.append({
-                "detection_id": idx,
-                "bbox": box,
-                "sku_id": match_res["sku_id"],
-                "confidence": match_res["confidence"],
-                "recognition_status": match_res["status"],
-                "top_candidates": match_res["top_candidates"]
-            })
-
-        # 4. Spatially group detections into horizontal shelf rows (top-to-bottom, left-to-right)
-        detected_rows = self.clusterer.cluster_detections(detections)
-
-        # 5. Sequence alignment against expected planogram
-        audit_report = self.aligner.align_shelf(expected_planogram_rows, detected_rows)
-
-        # 6. Generate annotated visualization
-        all_aligned_slots: List[Dict[str, Any]] = []
-        for r in audit_report["row_alignments"]:
-            all_aligned_slots.extend(r["alignment"])
-
-        annotated_img = draw_planogram_audit(img, all_aligned_slots)
-
-        elapsed = time.perf_counter() - start_time
-        audit_report["annotated_image"] = annotated_img
-        audit_report["inference_time_seconds"] = round(elapsed, 4)
-
-        return audit_report
+if __name__ == "__main__":
+    main()
